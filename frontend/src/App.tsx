@@ -9,7 +9,9 @@ import {
 
 // Admin Pages
 import AdminDashboard from "./pages/Admin/Dashboard";
+import ChangePassword from "./pages/Auth/ChangePassword";
 import CreateTask from "./pages/Admin/CreateTask";
+import ForgotPassword from "./pages/Auth/ForgotPassword";
 import Layout from "./components/Layout";
 // Auth Pages
 import Login from "./pages/Auth/Login";
@@ -23,6 +25,7 @@ import { ROUTES } from "./routes/routes";
 import Signup from "./pages/Auth/Signup";
 // User Pages
 import UserDashboard from "./pages/User/Dashboard";
+import VerifyEmail from "./pages/Auth/VerifyEmail";
 import ViewTaskDetails from "./pages/User/ViewTaskDetails";
 import { useState } from "react";
 
@@ -33,18 +36,13 @@ function App() {
 
   return (
     <Router>
-      <Layout
-        isAuthenticated={isAuthenticated}
-        userRole={userRole}
-        onLogout={() => {
-          // TODO: Implement logout functionality
-          console.log("Logout clicked");
-        }}
-      >
+      <Layout>
         <Routes>
           {/* Public Routes */}
           <Route path={ROUTES.LOGIN} element={<Login />} />
           <Route path={ROUTES.SIGNUP} element={<Signup />} />
+          <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
+          <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmail />} />
 
           {/* Redirect root to appropriate dashboard */}
           <Route
@@ -90,6 +88,7 @@ function App() {
               path={ROUTES.USER.VIEW_TASK_DETAILS}
               element={<ViewTaskDetails />}
             />
+            <Route path={ROUTES.CHANGE_PASSWORD} element={<ChangePassword />} />
           </Route>
 
           {/* Catch all route */}

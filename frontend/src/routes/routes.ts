@@ -3,6 +3,9 @@ export const ROUTES = {
   // Public routes
   LOGIN: "/login",
   SIGNUP: "/signup",
+  FORGOT_PASSWORD: "/forgot-password",
+  CHANGE_PASSWORD: "/change-password",
+  VERIFY_EMAIL: "/verify-email",
 
   // Admin routes
   ADMIN: {
@@ -25,6 +28,8 @@ export const NAVIGATION_ROUTES = {
   public: [
     { path: ROUTES.LOGIN, label: "Login" },
     { path: ROUTES.SIGNUP, label: "Signup" },
+    { path: ROUTES.FORGOT_PASSWORD, label: "Forgot Password" },
+    { path: ROUTES.VERIFY_EMAIL, label: "Verify Email" },
   ],
   admin: [
     { path: ROUTES.ADMIN.DASHBOARD, label: "Dashboard" },
