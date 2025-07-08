@@ -189,10 +189,7 @@ userSchema.virtual("fullName").get(function () {
   return `${this.firstName} ${this.lastName}`;
 });
 
-// Virtual for account lock status
-userSchema.virtual("isLocked").get(function () {
-  return !!(this.lockUntil && this.lockUntil > new Date());
-});
+// Virtual for account lock status (removed to avoid conflict with instance method)
 
 // Pre-save middleware to hash password
 userSchema.pre("save", async function (next) {
