@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
 import {
   Select,
   SelectContent,
@@ -14,7 +13,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { taskService, type CreateTaskData } from "@/utils/taskService";
+import {
+  taskService,
+  type Task,
+  type UpdateTaskData,
+} from "@/utils/taskService";
 import { useAuth } from "@/hooks/useAuth";
 import api from "@/utils/axiosInstance";
 
@@ -27,45 +30,66 @@ interface User {
   position?: string;
 }
 
-const CreateTask = () => {
+const EditTask = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
-  const [formData, setFormData] = useState<CreateTaskData>({
-    title: "",
-    description: "",
-    type: "feature",
-    priority: "medium",
-    assignee: "",
-    project: "",
-    department: "",
-    dueDate: "",
-    estimatedHours: undefined,
-    tags: [],
-    isPublic: false,
-  });
+  const [task, setTask] = useState<Task | null>(null);
+  const [formData, setFormData] = useState<UpdateTaskData>({});
   const [tagInput, setTagInput] = useState("");
 
-  // Fetch users for assignee selection
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await api.get("/users");
-        setUsers(response.data.data.users);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-        toast.error("Failed to load users");
-      }
-    };
-
-    if (isAuthenticated) {
+    if (id && isAuthenticated) {
+      fetchTask();
       fetchUsers();
     }
-  }, [isAuthenticated]);
+  }, [id, isAuthenticated]);
+
+  const fetchTask = async () => {
+    if (!id) return;
+
+    try {
+      setLoading(true);
+      const taskData = await taskService.getTaskById(id);
+      setTask(taskData);
+      setFormData({
+        title: taskData.title,
+        description: taskData.description,
+        type: taskData.type,
+        priority: taskData.priority,
+        assignee: taskData.assignee._id,
+        project: taskData.project || "",
+        department: taskData.department || "",
+        dueDate: taskData.dueDate
+          ? new Date(taskData.dueDate).toISOString().split("T")[0]
+          : "",
+        estimatedHours: taskData.estimatedHours,
+        tags: taskData.tags,
+        isPublic: taskData.isPublic,
+      });
+    } catch (error) {
+      console.error("Failed to fetch task:", error);
+      toast.error("Failed to load task");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+      const response = await api.get("/users");
+      setUsers(response.data.data.users);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+      toast.error("Failed to load users");
+    }
+  };
 
   const handleInputChange = (
-    field: keyof CreateTaskData,
+    field: keyof UpdateTaskData,
     value: string | number | boolean | string[] | undefined
   ) => {
     setFormData((prev) => ({
@@ -95,8 +119,9 @@ const CreateTask = () => {
     e.preventDefault();
 
     if (
-      !formData.title.trim() ||
-      !formData.description.trim() ||
+      !task ||
+      !formData.title?.trim() ||
+      !formData.description?.trim() ||
       !formData.assignee
     ) {
       toast.error("Please fill in all required fields");
@@ -104,24 +129,46 @@ const CreateTask = () => {
     }
 
     try {
-      setLoading(true);
-      await taskService.createTask(formData);
-      toast.success("Task created successfully");
-      navigate("/admin/manage-tasks");
+      setSaving(true);
+      await taskService.updateTask(task._id, formData);
+      toast.success("Task updated successfully");
+      navigate(`/tasks/${task._id}`);
     } catch (error: unknown) {
-      console.error("Failed to create task:", error);
+      console.error("Failed to update task:", error);
       const message =
-        error instanceof Error ? error.message : "Failed to create task";
+        error instanceof Error ? error.message : "Failed to update task";
       toast.error(message);
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
   if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Please log in to create tasks</p>
+        <p className="text-gray-500">Please log in to edit tasks</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <Card className="animate-pulse">
+          <CardContent className="p-6">
+            <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!task) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-500">Task not found</p>
       </div>
     );
   }
@@ -130,7 +177,7 @@ const CreateTask = () => {
     <div className="max-w-4xl mx-auto">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Create New Task</CardTitle>
+          <CardTitle className="text-2xl font-bold">Edit Task</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -140,7 +187,7 @@ const CreateTask = () => {
                 <Label htmlFor="title">Task Title *</Label>
                 <Input
                   id="title"
-                  value={formData.title}
+                  value={formData.title || ""}
                   onChange={(e) => handleInputChange("title", e.target.value)}
                   placeholder="Enter task title"
                   required
@@ -151,7 +198,7 @@ const CreateTask = () => {
                 <Label htmlFor="description">Description *</Label>
                 <textarea
                   id="description"
-                  value={formData.description}
+                  value={formData.description || ""}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleInputChange("description", e.target.value)
                   }
@@ -165,7 +212,7 @@ const CreateTask = () => {
               <div>
                 <Label htmlFor="type">Type</Label>
                 <Select
-                  value={formData.type}
+                  value={formData.type || "feature"}
                   onValueChange={(value) => handleInputChange("type", value)}
                 >
                   <SelectTrigger>
@@ -184,7 +231,7 @@ const CreateTask = () => {
               <div>
                 <Label htmlFor="priority">Priority</Label>
                 <Select
-                  value={formData.priority}
+                  value={formData.priority || "medium"}
                   onValueChange={(value) =>
                     handleInputChange("priority", value)
                   }
@@ -227,9 +274,8 @@ const CreateTask = () => {
                 <Input
                   id="dueDate"
                   type="date"
-                  value={formData.dueDate}
+                  value={formData.dueDate || ""}
                   onChange={(e) => handleInputChange("dueDate", e.target.value)}
-                  min={new Date().toISOString().split("T")[0]}
                 />
               </div>
 
@@ -237,7 +283,7 @@ const CreateTask = () => {
                 <Label htmlFor="project">Project</Label>
                 <Input
                   id="project"
-                  value={formData.project}
+                  value={formData.project || ""}
                   onChange={(e) => handleInputChange("project", e.target.value)}
                   placeholder="Enter project name"
                 />
@@ -247,7 +293,7 @@ const CreateTask = () => {
                 <Label htmlFor="department">Department</Label>
                 <Input
                   id="department"
-                  value={formData.department}
+                  value={formData.department || ""}
                   onChange={(e) =>
                     handleInputChange("department", e.target.value)
                   }
@@ -323,7 +369,7 @@ const CreateTask = () => {
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="isPublic"
-                checked={formData.isPublic}
+                checked={formData.isPublic || false}
                 onCheckedChange={(checked) =>
                   handleInputChange("isPublic", checked)
                 }
@@ -336,13 +382,13 @@ const CreateTask = () => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => navigate("/admin/manage-tasks")}
-                disabled={loading}
+                onClick={() => navigate(`/tasks/${task._id}`)}
+                disabled={saving}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? "Creating..." : "Create Task"}
+              <Button type="submit" disabled={saving}>
+                {saving ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </form>
@@ -352,4 +398,4 @@ const CreateTask = () => {
   );
 };
 
-export default CreateTask;
+export default EditTask;

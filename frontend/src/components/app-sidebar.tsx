@@ -34,17 +34,18 @@ import { NavDocuments } from "@/components/nav-documents";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
+import { ROUTES } from "@/routes/routes";
 
 const data = {
   navMain: [
     {
       title: "My Dashboard",
-      url: "#",
+      url: ROUTES.USER.DASHBOARD,
       icon: IconDashboard,
     },
     {
       title: "My Tasks",
-      url: "#",
+      url: ROUTES.USER.MY_TASKS,
       icon: IconListDetails,
     },
     {

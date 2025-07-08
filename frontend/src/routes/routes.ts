@@ -14,13 +14,14 @@ export const ROUTES = {
     CREATE_TASK: "/admin/create-task",
     MANAGE_TASKS: "/admin/manage-tasks",
     MANAGE_USERS: "/admin/manage-users",
+    EDIT_TASK: "/admin/edit-task/:id",
   },
 
   // User routes
   USER: {
     DASHBOARD: "/user/dashboard",
     MY_TASKS: "/user/my-tasks",
-    VIEW_TASK_DETAILS: "/user/view-task-details",
+    VIEW_TASK_DETAILS: "/tasks/:id",
   },
 } as const;
 

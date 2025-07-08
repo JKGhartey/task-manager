@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import AdminDashboard from "../pages/Admin/Dashboard";
 import ChangePassword from "../pages/Auth/ChangePassword";
 import CreateTask from "../pages/Admin/CreateTask";
+import EditTask from "../pages/Admin/EditTask";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
 // Auth Pages
 import Login from "../pages/Auth/Login";
@@ -74,6 +75,7 @@ export function AppRoutes() {
         <Route path={ROUTES.ADMIN.CREATE_TASK} element={<CreateTask />} />
         <Route path={ROUTES.ADMIN.MANAGE_TASKS} element={<ManageTasks />} />
         <Route path={ROUTES.ADMIN.MANAGE_USERS} element={<ManageUsers />} />
+        <Route path="/admin/edit-task/:id" element={<EditTask />} />
       </Route>
 
       {/* User Routes */}

@@ -1,4 +1,5 @@
 import { IconCirclePlusFilled, type Icon } from "@tabler/icons-react";
+import { Link, useLocation } from "react-router-dom";
 
 import {
   SidebarGroup,
@@ -17,6 +18,8 @@ export function NavMain({
     icon?: Icon;
   }[];
 }) {
+  const location = useLocation();
+
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-3">
@@ -32,19 +35,30 @@ export function NavMain({
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu className="space-y-1">
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title} className="w-full">
-              <SidebarMenuButton
-                tooltip={item.title}
-                className="w-full h-10 px-3 text-sm flex items-center gap-3 rounded-lg hover:bg-accent/80 hover:text-accent-foreground transition-all duration-200 group border-0"
-              >
-                {item.icon && (
-                  <item.icon className="size-4 text-muted-foreground group-hover:text-accent-foreground transition-colors duration-200" />
-                )}
-                <span className="font-medium">{item.title}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {items.map((item) => {
+            const isActive = location.pathname === item.url;
+
+            return (
+              <SidebarMenuItem key={item.title} className="w-full">
+                <SidebarMenuButton
+                  asChild
+                  tooltip={item.title}
+                  className={`w-full h-10 px-3 text-sm flex items-center gap-3 rounded-lg transition-all duration-200 group border-0 ${
+                    isActive
+                      ? "bg-accent text-accent-foreground"
+                      : "hover:bg-accent/80 hover:text-accent-foreground"
+                  }`}
+                >
+                  <Link to={item.url}>
+                    {item.icon && (
+                      <item.icon className="size-4 text-muted-foreground group-hover:text-accent-foreground transition-colors duration-200" />
+                    )}
+                    <span className="font-medium">{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
