@@ -4,9 +4,13 @@ import { connectDB } from "./config/db";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import swaggerUi from "swagger-ui-express";
 import reportRoutes from "./routes/reportRoutes";
 import taskRoutes from "./routes/taskRoutes";
 import userRoutes from "./routes/userRoutes";
+
+// Import Swagger configuration
+import { specs } from "./config/swagger";
 
 // Load environment variables
 dotenv.config();
@@ -37,6 +41,23 @@ app.get("/", (req, res) => {
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
+
+// Swagger Documentation
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, {
+    customCss: ".swagger-ui .topbar { display: none }",
+    customSiteTitle: "Task Manager API Documentation",
+    customfavIcon: "/favicon.ico",
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+      filter: true,
+      showExtensions: true,
+    },
+  })
+);
 
 // Register API routes
 app.use("/api/auth", authRoutes);
