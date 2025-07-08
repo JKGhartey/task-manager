@@ -5,28 +5,32 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
-import type { ChangePasswordData } from "@/types/auth";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ROUTES } from "@/routes/routes";
 import type React from "react";
+import type { ResetPasswordData } from "@/types/auth";
 import { authService } from "@/utils/authService";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-export function ChangePasswordForm({
+export function ResetPasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
+
   const [formData, setFormData] = useState<
-    ChangePasswordData & { confirmPassword: string }
+    ResetPasswordData & { confirmPassword: string }
   >({
-    currentPassword: "",
-    newPassword: "",
+    token: token || "",
+    password: "",
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
@@ -40,24 +44,20 @@ export function ChangePasswordForm({
   };
 
   const validateForm = (): boolean => {
-    if (!formData.currentPassword) {
-      toast.error("Current password is required");
+    if (!formData.token) {
+      toast.error("Reset token is missing");
       return false;
     }
-    if (!formData.newPassword) {
+    if (!formData.password) {
       toast.error("New password is required");
       return false;
     }
-    if (formData.newPassword.length < 6) {
-      toast.error("New password must be at least 6 characters long");
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
       return false;
     }
-    if (formData.newPassword !== formData.confirmPassword) {
-      toast.error("New passwords do not match");
-      return false;
-    }
-    if (formData.currentPassword === formData.newPassword) {
-      toast.error("New password must be different from current password");
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
       return false;
     }
     return true;
@@ -71,22 +71,21 @@ export function ChangePasswordForm({
     setLoading(true);
 
     try {
-      const { currentPassword, newPassword } = formData;
-      const response = await authService.changePassword({
-        currentPassword,
-        newPassword,
+      const { token, password } = formData;
+      const response = await authService.resetPassword({
+        token,
+        password,
       });
 
       if (response.success) {
-        toast.success("Password changed successfully!");
-        // Redirect to appropriate dashboard
-        navigate("/");
+        toast.success("Password reset successfully!");
+        navigate(ROUTES.LOGIN);
       }
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
           ? err.message
-          : "An error occurred while changing password";
+          : "An error occurred while resetting password";
       if (typeof err === "object" && err !== null && "response" in err) {
         const axiosError = err as {
           response?: { data?: { message?: string } };
@@ -100,46 +99,54 @@ export function ChangePasswordForm({
     }
   };
 
+  if (!token) {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Invalid Reset Link</CardTitle>
+            <CardDescription>
+              The password reset link is invalid or has expired.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={() => navigate(ROUTES.FORGOT_PASSWORD)}
+              className="w-full"
+            >
+              Request New Reset Link
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Change your password</CardTitle>
-          <CardDescription>
-            Enter your current password and new password below
-          </CardDescription>
+          <CardTitle className="text-2xl">Reset your password</CardTitle>
+          <CardDescription>Enter your new password below</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="current-password">Current Password</Label>
-                <Input
-                  id="current-password"
-                  name="currentPassword"
-                  type="password"
-                  value={formData.currentPassword}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
                 <Label htmlFor="new-password">New Password</Label>
                 <Input
                   id="new-password"
-                  name="newPassword"
+                  name="password"
                   type="password"
-                  value={formData.newPassword}
+                  value={formData.password}
                   onChange={handleInputChange}
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="confirm-new-password">
-                  Confirm New Password
-                </Label>
+                <Label htmlFor="confirm-password">Confirm New Password</Label>
                 <Input
-                  id="confirm-new-password"
+                  id="confirm-password"
                   name="confirmPassword"
                   type="password"
                   value={formData.confirmPassword}
@@ -148,12 +155,12 @@ export function ChangePasswordForm({
                 />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Updating..." : "Update Password"}
+                {loading ? "Resetting..." : "Reset Password"}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
-              <a href="/" className="underline underline-offset-4">
-                Back to dashboard
+              <a href={ROUTES.LOGIN} className="underline underline-offset-4">
+                Back to login
               </a>
             </div>
           </form>

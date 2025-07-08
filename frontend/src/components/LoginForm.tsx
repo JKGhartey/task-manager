@@ -10,10 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { LoginData } from "@/types/auth";
+import { ROUTES } from "@/routes/routes";
 import type React from "react";
 import { authService } from "@/utils/authService";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -22,6 +24,7 @@ export function LoginForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState<LoginData>({
     email: "",
     password: "",
@@ -60,10 +63,17 @@ export function LoginForm({
 
       if (response.success) {
         toast.success("Login successful!");
-        // Store the token
-        authService.setToken(response.data.token);
-        // Redirect to dashboard
-        navigate("/dashboard");
+
+        // Use auth context to login and store user data
+        login(response.data.user, response.data.token);
+
+        // Redirect based on user role
+        const userRole = response.data.user.role;
+        if (userRole === "admin") {
+          navigate(ROUTES.ADMIN.DASHBOARD);
+        } else {
+          navigate(ROUTES.USER.DASHBOARD);
+        }
       }
     } catch (err: unknown) {
       const errorMessage =
@@ -84,8 +94,8 @@ export function LoginForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl brand-primary">Welcome Back</CardTitle>
           <CardDescription>
             Enter your email below to login to your account
           </CardDescription>

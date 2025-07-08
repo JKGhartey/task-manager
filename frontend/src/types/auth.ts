@@ -14,6 +14,29 @@ export interface LoginData {
   password: string;
 }
 
+export interface ForgotPasswordData {
+  email: string;
+}
+
+export interface ResetPasswordData {
+  token: string;
+  password: string;
+}
+
+export interface ChangePasswordData {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface UpdateProfileData {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  department?: string;
+  position?: string;
+  dateOfBirth?: string;
+}
+
 export interface AuthResponse {
   success: boolean;
   message: string;

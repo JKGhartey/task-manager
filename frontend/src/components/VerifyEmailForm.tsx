@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail } from "lucide-react";
+import { ROUTES } from "@/routes/routes";
 import type React from "react";
 import { authService } from "@/utils/authService";
 import { cn } from "@/lib/utils";
@@ -44,9 +45,13 @@ export function VerifyEmailForm({
 
       if (response.success) {
         toast.success(response.message);
-        // Redirect to dashboard after successful verification
+        // Redirect based on user role after successful verification
         setTimeout(() => {
-          navigate("/dashboard");
+          if (response.data?.user?.role === "admin") {
+            navigate(ROUTES.ADMIN.DASHBOARD);
+          } else {
+            navigate(ROUTES.USER.DASHBOARD);
+          }
         }, 2000);
       }
     } catch (err: unknown) {
@@ -99,10 +104,12 @@ export function VerifyEmailForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-            <Mail className="h-6 w-6 text-blue-600" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-accent/20">
+            <Mail className="h-6 w-6 brand-secondary" />
           </div>
-          <CardTitle className="text-2xl">Verify your email</CardTitle>
+          <CardTitle className="text-2xl brand-primary">
+            Verify your email
+          </CardTitle>
           <CardDescription>
             {providedToken
               ? "Your verification token has been pre-filled below. Click 'Verify Email' to complete the verification."

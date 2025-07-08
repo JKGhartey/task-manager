@@ -1,103 +1,26 @@
 import "./App.css";
 
-import {
-  Navigate,
-  Route,
-  BrowserRouter as Router,
-  Routes,
-} from "react-router-dom";
-
-// Admin Pages
-import AdminDashboard from "./pages/Admin/Dashboard";
-import ChangePassword from "./pages/Auth/ChangePassword";
-import CreateTask from "./pages/Admin/CreateTask";
-import ForgotPassword from "./pages/Auth/ForgotPassword";
+import { AppRoutes } from "./components/AppRoutes";
+import { AuthProvider } from "@/context/AuthContext";
 import Layout from "./components/Layout";
-// Auth Pages
-import Login from "./pages/Auth/Login";
-import ManageTasks from "./pages/Admin/ManageTasks";
-import ManageUsers from "./pages/Admin/ManageUsers";
-import MyTasks from "./pages/User/MyTasks";
-// Components
-import PrivateRoute from "./routes/PrivateRoute";
-// Route constants
-import { ROUTES } from "./routes/routes";
-import Signup from "./pages/Auth/Signup";
+import { BrowserRouter as Router } from "react-router-dom";
 import { Toaster } from "sonner";
-// User Pages
-import UserDashboard from "./pages/User/Dashboard";
-import VerifyEmail from "./pages/Auth/VerifyEmail";
-import ViewTaskDetails from "./pages/User/ViewTaskDetails";
-import { useState } from "react";
 
 function App() {
-  // TODO: Replace with actual auth state management
-  const [isAuthenticated] = useState(false);
-  const [userRole] = useState<"admin" | "user" | null>(null);
-
   return (
-    <Router>
-      <Layout>
-        <Toaster position="top-right" richColors closeButton duration={4000} />
-        <Routes>
-          {/* Public Routes */}
-          <Route path={ROUTES.LOGIN} element={<Login />} />
-          <Route path={ROUTES.SIGNUP} element={<Signup />} />
-          <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
-          <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmail />} />
-
-          {/* Redirect root to appropriate dashboard */}
-          <Route
-            path="/"
-            element={
-              isAuthenticated ? (
-                userRole === "admin" ? (
-                  <Navigate to={ROUTES.ADMIN.DASHBOARD} replace />
-                ) : (
-                  <Navigate to={ROUTES.USER.DASHBOARD} replace />
-                )
-              ) : (
-                <Navigate to={ROUTES.LOGIN} replace />
-              )
-            }
+    <AuthProvider>
+      <Router>
+        <Layout>
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            duration={4000}
           />
-
-          {/* Admin Routes */}
-          <Route
-            element={
-              <PrivateRoute
-                isAuthenticated={isAuthenticated && userRole === "admin"}
-              />
-            }
-          >
-            <Route path={ROUTES.ADMIN.DASHBOARD} element={<AdminDashboard />} />
-            <Route path={ROUTES.ADMIN.CREATE_TASK} element={<CreateTask />} />
-            <Route path={ROUTES.ADMIN.MANAGE_TASKS} element={<ManageTasks />} />
-            <Route path={ROUTES.ADMIN.MANAGE_USERS} element={<ManageUsers />} />
-          </Route>
-
-          {/* User Routes */}
-          <Route
-            element={
-              <PrivateRoute
-                isAuthenticated={isAuthenticated && userRole === "user"}
-              />
-            }
-          >
-            <Route path={ROUTES.USER.DASHBOARD} element={<UserDashboard />} />
-            <Route path={ROUTES.USER.MY_TASKS} element={<MyTasks />} />
-            <Route
-              path={ROUTES.USER.VIEW_TASK_DETAILS}
-              element={<ViewTaskDetails />}
-            />
-            <Route path={ROUTES.CHANGE_PASSWORD} element={<ChangePassword />} />
-          </Route>
-
-          {/* Catch all route */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Layout>
-    </Router>
+          <AppRoutes />
+        </Layout>
+      </Router>
+    </AuthProvider>
   );
 }
 
