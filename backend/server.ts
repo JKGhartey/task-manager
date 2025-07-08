@@ -1,7 +1,12 @@
+// Import routes
+import authRoutes from "./routes/authRoutes";
 import { connectDB } from "./config/db";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import reportRoutes from "./routes/reportRoutes";
+import taskRoutes from "./routes/taskRoutes";
+import userRoutes from "./routes/userRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -33,24 +38,11 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-app.get("/api/auth", (req, res) => {
-  res.json({ message: "Auth endpoint" });
-});
-
-app.get("/api/tasks", (req, res) => {
-  // Placeholder for tasks endpoint
-  res.json({ message: "Get all tasks endpoint" });
-});
-
-app.post("/api/tasks", (req, res) => {
-  // Placeholder for create task endpoint
-  res.json({ message: "Create task endpoint", data: req.body });
-});
-
-app.get("/api/users", (req, res) => {
-  // Placeholder for users endpoint
-  res.json({ message: "Get all users endpoint" });
-});
+// Register API routes
+app.use("/api/auth", authRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/reports", reportRoutes);
 
 // Error handling middleware
 app.use(

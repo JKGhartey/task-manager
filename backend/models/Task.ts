@@ -11,12 +11,12 @@ export enum TaskPriority {
 
 // Task status enum
 export enum TaskStatus {
-  TODO = "todo",
-  IN_PROGRESS = "in_progress",
-  REVIEW = "review",
-  TESTING = "testing",
-  DONE = "done",
-  CANCELLED = "cancelled",
+  Pending = "pending",
+  InProgress = "in_progress",
+  Review = "review",
+  Testing = "testing",
+  Done = "done",
+  Cancelled = "cancelled",
 }
 
 // Task type enum
@@ -105,7 +105,7 @@ const taskSchema = new Schema<ITask>(
     status: {
       type: String,
       enum: Object.values(TaskStatus),
-      default: TaskStatus.TODO,
+      default: TaskStatus.Pending,
     },
     assignee: {
       type: Schema.Types.ObjectId,
@@ -289,13 +289,13 @@ taskSchema.virtual("daysUntilDue").get(function () {
 // Virtual for overdue status
 taskSchema.virtual("isOverdue").get(function () {
   return (
-    this.dueDate && this.dueDate < new Date() && this.status !== TaskStatus.DONE
+    this.dueDate && this.dueDate < new Date() && this.status !== TaskStatus.Done
   );
 });
 
 // Pre-save middleware to update completion date
 taskSchema.pre("save", function (next) {
-  if (this.status === TaskStatus.DONE && !this.completedDate) {
+  if (this.status === TaskStatus.Done && !this.completedDate) {
     this.completedDate = new Date();
   }
   next();
@@ -392,7 +392,7 @@ taskSchema.statics.findByStatus = function (status: TaskStatus) {
 taskSchema.statics.findOverdueTasks = function () {
   return this.find({
     dueDate: { $lt: new Date() },
-    status: { $ne: TaskStatus.DONE },
+    status: { $ne: TaskStatus.Done },
   }).populate("assignee", "firstName lastName email");
 };
 
