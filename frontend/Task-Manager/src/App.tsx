@@ -23,6 +23,7 @@ import { ROUTES } from "./routes/routes";
 import Signup from "./pages/Auth/Signup";
 // User Pages
 import UserDashboard from "./pages/User/Dashboard";
+import ViewTaskDetails from "./pages/User/ViewTaskDetails";
 import { useState } from "react";
 
 function App() {
@@ -85,6 +86,10 @@ function App() {
           >
             <Route path={ROUTES.USER.DASHBOARD} element={<UserDashboard />} />
             <Route path={ROUTES.USER.MY_TASKS} element={<MyTasks />} />
+            <Route
+              path={ROUTES.USER.VIEW_TASK_DETAILS}
+              element={<ViewTaskDetails />}
+            />
           </Route>
 
           {/* Catch all route */}

@@ -16,6 +16,7 @@ export const ROUTES = {
   USER: {
     DASHBOARD: "/user/dashboard",
     MY_TASKS: "/user/my-tasks",
+    VIEW_TASK_DETAILS: "/user/view-task-details",
   },
 } as const;
 
@@ -34,5 +35,6 @@ export const NAVIGATION_ROUTES = {
   user: [
     { path: ROUTES.USER.DASHBOARD, label: "Dashboard" },
     { path: ROUTES.USER.MY_TASKS, label: "My Tasks" },
+    { path: ROUTES.USER.VIEW_TASK_DETAILS, label: "View Task Details" },
   ],
 } as const;
