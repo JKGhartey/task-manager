@@ -23,6 +23,7 @@ import PrivateRoute from "./routes/PrivateRoute";
 // Route constants
 import { ROUTES } from "./routes/routes";
 import Signup from "./pages/Auth/Signup";
+import { Toaster } from "sonner";
 // User Pages
 import UserDashboard from "./pages/User/Dashboard";
 import VerifyEmail from "./pages/Auth/VerifyEmail";
@@ -37,6 +38,7 @@ function App() {
   return (
     <Router>
       <Layout>
+        <Toaster position="top-right" richColors closeButton duration={4000} />
         <Routes>
           {/* Public Routes */}
           <Route path={ROUTES.LOGIN} element={<Login />} />

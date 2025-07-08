@@ -87,6 +87,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
           isEmailVerified: user.isEmailVerified,
         },
         token,
+        emailVerificationToken, // Include this for development/testing
       },
     });
   } catch (error) {
