@@ -5,11 +5,13 @@ import cors from "cors";
 import departmentRoutes from "./routes/departmentRoutes";
 import dotenv from "dotenv";
 import express from "express";
+import projectRoutes from "./routes/projectRoutes";
 import reportRoutes from "./routes/reportRoutes";
 // Import Swagger configuration
 import { specs } from "./config/swagger";
 import swaggerUi from "swagger-ui-express";
 import taskRoutes from "./routes/taskRoutes";
+import teamRoutes from "./routes/teamRoutes";
 import userRoutes from "./routes/userRoutes";
 
 // Load environment variables
@@ -65,6 +67,8 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/teams", teamRoutes);
+app.use("/api/projects", projectRoutes);
 
 // Error handling middleware
 app.use(

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { taskService, type CreateTaskData } from "@/utils/taskService";
+import { getAllProjects, type Project } from "@/utils/projectService";
 import { useAuth } from "@/hooks/useAuth";
 import api from "@/utils/axiosInstance";
 
@@ -39,6 +40,7 @@ const CreateTask = () => {
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [formData, setFormData] = useState<CreateTaskData>({
     title: "",
     description: "",
@@ -87,6 +89,23 @@ const CreateTask = () => {
 
     if (isAuthenticated) {
       fetchDepartments();
+    }
+  }, [isAuthenticated]);
+
+  // Fetch projects for project selection
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const projectsData = await getAllProjects();
+        setProjects(projectsData);
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+        toast.error("Failed to load projects");
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchProjects();
     }
   }, [isAuthenticated]);
 
@@ -270,6 +289,25 @@ const CreateTask = () => {
               </div>
 
               <div>
+                <Label htmlFor="project">Project</Label>
+                <Select
+                  value={formData.project || undefined}
+                  onValueChange={(value) => handleInputChange("project", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select project" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {projects.map((project) => (
+                      <SelectItem key={project._id} value={project._id}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
                 <Label htmlFor="dueDate">Due Date</Label>
                 <Input
                   id="dueDate"
@@ -277,16 +315,6 @@ const CreateTask = () => {
                   value={formData.dueDate}
                   onChange={(e) => handleInputChange("dueDate", e.target.value)}
                   min={new Date().toISOString().split("T")[0]}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="project">Project</Label>
-                <Input
-                  id="project"
-                  value={formData.project}
-                  onChange={(e) => handleInputChange("project", e.target.value)}
-                  placeholder="Enter project name"
                 />
               </div>
 

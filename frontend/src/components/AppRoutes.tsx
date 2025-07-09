@@ -10,7 +10,9 @@ import Landing from "../pages/Landing";
 // Auth Pages
 import Login from "../pages/Auth/Login";
 import ManageDepartments from "../pages/Admin/ManageDepartments";
+import ManageProjects from "../pages/Admin/ManageProjects";
 import ManageTasks from "../pages/Admin/ManageTasks";
+import ManageTeams from "../pages/Admin/ManageTeams";
 import ManageUsers from "../pages/Admin/ManageUsers";
 import MyTasks from "../pages/User/MyTasks";
 // Components
@@ -95,6 +97,11 @@ export function AppRoutes() {
         <Route
           path={ROUTES.ADMIN.MANAGE_DEPARTMENTS}
           element={<ManageDepartments />}
+        />
+        <Route path={ROUTES.ADMIN.MANAGE_TEAMS} element={<ManageTeams />} />
+        <Route
+          path={ROUTES.ADMIN.MANAGE_PROJECTS}
+          element={<ManageProjects />}
         />
         <Route path={ROUTES.ADMIN.SYSTEM_HEALTH} element={<SystemHealth />} />
         <Route

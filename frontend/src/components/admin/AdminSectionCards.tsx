@@ -9,6 +9,7 @@ import {
   IconTrendingUp,
   IconDatabase,
   IconSettings,
+  IconFolder,
 } from "@tabler/icons-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -21,12 +22,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { taskService, type TaskStats } from "@/utils/taskService";
+import { getAllTeams } from "@/utils/teamService";
+import { getAllProjects } from "@/utils/projectService";
 import { useUserStats } from "@/hooks/useUsers";
 
 interface AdminStats {
   totalUsers: number;
   activeUsers: number;
   totalTasks: number;
+  totalTeams: number;
+  totalProjects: number;
   systemHealth: number;
   pendingApprovals: number;
   systemAlerts: number;
@@ -47,13 +52,19 @@ export function AdminSectionCards() {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        const taskData = await taskService.getTaskStats();
+        const [taskData, teams, projects] = await Promise.all([
+          taskService.getTaskStats(),
+          getAllTeams(),
+          getAllProjects(),
+        ]);
 
         setTaskStats(taskData);
         setAdminStats({
           totalUsers: userStats?.totalUsers || 0,
           activeUsers: userStats?.statusBreakdown.active || 0,
           totalTasks: taskData.totalTasks || 0,
+          totalTeams: teams.length,
+          totalProjects: projects.length,
           systemHealth: 98,
           pendingApprovals: 12,
           systemAlerts: 3,
@@ -75,7 +86,7 @@ export function AdminSectionCards() {
   if (loading) {
     return (
       <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
+        {[1, 2, 3, 4, 5, 6].map((i) => (
           <Card key={i} className="@container/card animate-pulse">
             <CardHeader>
               <div className="h-4 bg-muted rounded w-24 mb-2"></div>
@@ -131,6 +142,56 @@ export function AdminSectionCards() {
           <div className="text-muted-foreground">
             {userActivityRate}% activity rate
           </div>
+        </CardFooter>
+      </Card>
+
+      {/* Team Management Card */}
+      <Card className="@container/card">
+        <CardHeader>
+          <CardDescription>Team Management</CardDescription>
+          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+            {adminStats.totalTeams}
+          </CardTitle>
+          <CardAction>
+            <Badge
+              variant="outline"
+              className="text-green-600 border-green-200"
+            >
+              <IconUsers className="size-3" />
+              Active Teams
+            </Badge>
+          </CardAction>
+        </CardHeader>
+        <CardFooter className="flex-col items-start gap-1.5 text-sm">
+          <div className="line-clamp-1 flex gap-2 font-medium text-green-600">
+            Team collaboration <IconTrendingUp className="size-4" />
+          </div>
+          <div className="text-muted-foreground">User assignment enabled</div>
+        </CardFooter>
+      </Card>
+
+      {/* Project Management Card */}
+      <Card className="@container/card">
+        <CardHeader>
+          <CardDescription>Project Management</CardDescription>
+          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+            {adminStats.totalProjects}
+          </CardTitle>
+          <CardAction>
+            <Badge
+              variant="outline"
+              className="text-orange-600 border-orange-200"
+            >
+              <IconFolder className="size-3" />
+              Active Projects
+            </Badge>
+          </CardAction>
+        </CardHeader>
+        <CardFooter className="flex-col items-start gap-1.5 text-sm">
+          <div className="line-clamp-1 flex gap-2 font-medium text-orange-600">
+            Task organization <IconTrendingUp className="size-4" />
+          </div>
+          <div className="text-muted-foreground">Project-based workflow</div>
         </CardFooter>
       </Card>
 

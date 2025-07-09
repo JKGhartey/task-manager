@@ -40,6 +40,7 @@ export interface IUser extends Document {
   lockUntil?: Date;
   createdAt: Date;
   updatedAt: Date;
+  teams: mongoose.Schema.Types.ObjectId[];
 
   // Instance methods
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -160,6 +161,7 @@ const userSchema = new Schema<IUser>(
       type: Date,
       default: null,
     },
+    teams: [{ type: Schema.Types.ObjectId, ref: "Team" }],
   },
   {
     timestamps: true, // Adds createdAt and updatedAt fields

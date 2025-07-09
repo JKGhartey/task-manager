@@ -118,9 +118,8 @@ const taskSchema = new Schema<ITask>(
       required: [true, "Task creator is required"],
     },
     project: {
-      type: String,
-      trim: true,
-      maxlength: [100, "Project name cannot exceed 100 characters"],
+      type: Schema.Types.ObjectId,
+      ref: "Project",
     },
     department: {
       type: String,

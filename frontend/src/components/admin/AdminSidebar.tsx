@@ -10,6 +10,7 @@ import {
   IconDashboard,
   IconDatabase,
   IconFileDescription,
+  IconFolder,
   IconHelp,
   IconKey,
   IconListDetails,
@@ -52,6 +53,16 @@ const adminData = {
       title: "Manage Users",
       url: ROUTES.ADMIN.MANAGE_USERS,
       icon: IconUsers,
+    },
+    {
+      title: "Manage Teams",
+      url: ROUTES.ADMIN.MANAGE_TEAMS,
+      icon: IconUsers,
+    },
+    {
+      title: "Manage Projects",
+      url: ROUTES.ADMIN.MANAGE_PROJECTS,
+      icon: IconFolder,
     },
     {
       title: "View Departments",

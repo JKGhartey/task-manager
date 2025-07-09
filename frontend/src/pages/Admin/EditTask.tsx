@@ -18,6 +18,7 @@ import {
   type Task,
   type UpdateTaskData,
 } from "@/utils/taskService";
+import { getAllProjects, type Project } from "@/utils/projectService";
 import { useAuth } from "@/hooks/useAuth";
 import api from "@/utils/axiosInstance";
 
@@ -37,6 +38,7 @@ const EditTask = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [task, setTask] = useState<Task | null>(null);
   const [formData, setFormData] = useState<UpdateTaskData>({});
   const [tagInput, setTagInput] = useState("");
@@ -45,6 +47,7 @@ const EditTask = () => {
     if (id && isAuthenticated) {
       fetchTask();
       fetchUsers();
+      fetchProjects();
     }
   }, [id, isAuthenticated]);
 
@@ -85,6 +88,16 @@ const EditTask = () => {
     } catch (error) {
       console.error("Failed to fetch users:", error);
       toast.error("Failed to load users");
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const projectsData = await getAllProjects();
+      setProjects(projectsData);
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+      toast.error("Failed to load projects");
     }
   };
 
@@ -270,23 +283,22 @@ const EditTask = () => {
               </div>
 
               <div>
-                <Label htmlFor="dueDate">Due Date</Label>
-                <Input
-                  id="dueDate"
-                  type="date"
-                  value={formData.dueDate || ""}
-                  onChange={(e) => handleInputChange("dueDate", e.target.value)}
-                />
-              </div>
-
-              <div>
                 <Label htmlFor="project">Project</Label>
-                <Input
-                  id="project"
+                <Select
                   value={formData.project || ""}
-                  onChange={(e) => handleInputChange("project", e.target.value)}
-                  placeholder="Enter project name"
-                />
+                  onValueChange={(value) => handleInputChange("project", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select project" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {projects.map((project) => (
+                      <SelectItem key={project._id} value={project._id}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
