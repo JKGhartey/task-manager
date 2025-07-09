@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://taskmanager.com/sitemap.xml
+
+# Disallow admin and user dashboard pages (private content)
+Disallow: /admin/
+Disallow: /user/
+Disallow: /api/
+
+# Allow important public pages
+Allow: /login
+Allow: /signup
+Allow: /forgot-password
+Allow: /reset-password
+Allow: /verify-email
+
+# Crawl delay (optional)
+Crawl-delay: 1 

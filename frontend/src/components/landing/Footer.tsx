@@ -32,10 +32,14 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: Github, href: "#", label: "GitHub" },
+  { icon: Github, href: "https://github.com/JKGhartey", label: "GitHub" },
   { icon: Twitter, href: "#", label: "Twitter" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-  { icon: Mail, href: "mailto:support@taskmanager.com", label: "Email" },
+  {
+    icon: Linkedin,
+    href: "https://www.linkedin.com/in/gharteyjerome/",
+    label: "LinkedIn",
+  },
+  { icon: Mail, href: "mailto:gharteyjerome@gmail.com", label: "Email" },
 ];
 
 export function Footer() {

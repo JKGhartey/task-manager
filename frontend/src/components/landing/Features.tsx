@@ -93,20 +93,27 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="py-20 lg:py-32 relative overflow-hidden">
+    <section
+      id="features"
+      className="py-20 lg:py-32 relative overflow-hidden"
+      aria-labelledby="features-heading"
+    >
       {/* Background decoration */}
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 -z-10" aria-hidden="true">
         <div className="absolute right-0 top-1/4 w-72 h-72 bg-primary/5 rounded-full blur-3xl"></div>
         <div className="absolute left-0 bottom-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/3 to-secondary/3 rounded-full blur-3xl"></div>
       </div>
 
       <div className="container mx-auto px-4">
-        <div className="mx-auto max-w-4xl text-center mb-20">
+        <header className="mx-auto max-w-4xl text-center mb-20">
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary mb-6">
             Features
           </div>
-          <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+          <h2
+            id="features-heading"
+            className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl"
+          >
             Everything you need to
             <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               {" "}
@@ -117,17 +124,27 @@ export function Features() {
             Powerful features designed to streamline your workflow and boost
             team productivity. Built for modern teams who demand excellence.
           </p>
-        </div>
+        </header>
 
         {/* Bento Box Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4 max-w-7xl mx-auto">
+        <div
+          className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4 max-w-7xl mx-auto"
+          role="list"
+          aria-label="Task management features"
+        >
           {/* Large card - Task Organization */}
-          <div className="md:col-span-4 lg:col-span-6 md:row-span-2">
+          <article
+            className="md:col-span-4 lg:col-span-6 md:row-span-2"
+            role="listitem"
+          >
             <Card className="group border-0 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-background/60 backdrop-blur-sm overflow-hidden h-full">
               <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <CardHeader className="relative pb-4">
                 <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-xl bg-background/80 backdrop-blur-sm group-hover:bg-background/90 transition-all duration-300 shadow-lg">
-                  <CheckCircle className="h-8 w-8 text-green-500 group-hover:scale-110 transition-transform duration-300" />
+                  <CheckCircle
+                    className="h-8 w-8 text-green-500 group-hover:scale-110 transition-transform duration-300"
+                    aria-hidden="true"
+                  />
                 </div>
                 <CardTitle className="text-2xl group-hover:text-primary transition-colors duration-300 relative z-10">
                   Task Organization
@@ -142,7 +159,10 @@ export function Features() {
                 {/* Feature highlights */}
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                    <div
+                      className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"
+                      aria-hidden="true"
+                    ></div>
                     <div>
                       <h4 className="font-medium text-foreground mb-1">
                         Smart Categories
@@ -154,7 +174,10 @@ export function Features() {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                    <div
+                      className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"
+                      aria-hidden="true"
+                    ></div>
                     <div>
                       <h4 className="font-medium text-foreground mb-1">
                         Priority Levels
@@ -167,7 +190,10 @@ export function Features() {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                    <div
+                      className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"
+                      aria-hidden="true"
+                    ></div>
                     <div>
                       <h4 className="font-medium text-foreground mb-1">
                         Deadline Management
@@ -179,7 +205,10 @@ export function Features() {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                    <div
+                      className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"
+                      aria-hidden="true"
+                    ></div>
                     <div>
                       <h4 className="font-medium text-foreground mb-1">
                         Search & Filter
@@ -198,31 +227,30 @@ export function Features() {
                     <div>
                       <div className="text-2xl font-bold text-green-500">∞</div>
                       <div className="text-xs text-muted-foreground">
-                        Categories
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-green-500">4</div>
-                      <div className="text-xs text-muted-foreground">
-                        Priority Levels
+                        Unlimited Tasks
                       </div>
                     </div>
                     <div>
                       <div className="text-2xl font-bold text-green-500">
-                        ⚡
+                        50+
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        Smart Search
+                        Categories
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-green-500">
+                        100%
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Organized
                       </div>
                     </div>
                   </div>
                 </div>
               </CardContent>
-              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-20 transition-opacity duration-500">
-                <CheckCircle className="h-20 w-20 text-green-500 rotate-12" />
-              </div>
             </Card>
-          </div>
+          </article>
 
           {/* Medium card - Team Collaboration */}
           <div className="md:col-span-2 lg:col-span-3 md:row-span-1">

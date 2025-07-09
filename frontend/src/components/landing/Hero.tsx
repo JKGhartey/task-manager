@@ -4,9 +4,13 @@ import { ROUTES } from "@/routes/routes";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-32 lg:py-48 min-h-screen flex items-center">
+    <section
+      className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-32 lg:py-48 min-h-screen flex items-center"
+      role="banner"
+      aria-labelledby="hero-heading"
+    >
       {/* Enhanced animated background elements */}
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 -z-10" aria-hidden="true">
         <div className="absolute left-1/2 top-0 -translate-x-1/2 animate-pulse">
           <div className="h-96 w-96 rounded-full bg-primary/10 blur-3xl"></div>
         </div>
@@ -39,7 +43,10 @@ export function Hero() {
               </div>
 
               {/* Enhanced Main heading */}
-              <h1 className="mb-8 text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl leading-tight">
+              <h1
+                id="hero-heading"
+                className="mb-8 text-4xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl leading-tight"
+              >
                 <span className="block text-2xl sm:text-4xl lg:text-5xl text-muted-foreground font-medium mb-3">
                   Boost Your Team's
                 </span>
@@ -69,6 +76,7 @@ export function Hero() {
                   <Link
                     to={ROUTES.SIGNUP}
                     className="flex items-center gap-3 relative z-10"
+                    aria-label="Get started with TaskManager for free"
                   >
                     <span className="font-semibold">Get Started Free</span>
                     <span className="text-xs opacity-90 bg-white/20 px-2 py-1 rounded-full">
@@ -83,7 +91,11 @@ export function Hero() {
                   size="lg"
                   className="text-base px-8 py-3 h-auto group border-2 hover:bg-primary/5 transition-all duration-300"
                 >
-                  <Link to={ROUTES.LOGIN} className="flex items-center gap-2">
+                  <Link
+                    to={ROUTES.LOGIN}
+                    className="flex items-center gap-2"
+                    aria-label="Sign in to your existing account"
+                  >
                     <span className="font-medium">Sign In</span>
                     <span className="text-xs opacity-70">→</span>
                   </Link>
@@ -92,7 +104,7 @@ export function Hero() {
             </div>
 
             {/* Right side - Visual Demo */}
-            <div className="relative hidden lg:block">
+            <div className="relative hidden lg:block" aria-hidden="true">
               <div className="relative">
                 {/* Main demo card */}
                 <div className="bg-background/80 backdrop-blur-sm border rounded-2xl shadow-2xl p-6 transform rotate-3 hover:rotate-0 transition-transform duration-500">
@@ -125,40 +137,26 @@ export function Hero() {
           </div>
 
           {/* Enhanced Social proof */}
-          <div className="mt-20 pt-12 border-t border-border/50">
-            <div className="text-center mb-6">
-              <p className="text-sm font-medium text-muted-foreground mb-2">
-                Trusted by 10,000+ teams worldwide
-              </p>
-              <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <span className="text-yellow-500">★★★★★</span>
-                  <span>4.9/5 rating</span>
-                </span>
-                <span className="mx-2">•</span>
-                <span>99.9% uptime</span>
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-4 opacity-70">
+          <div className="mt-16">
+            <p className="text-sm text-muted-foreground mb-8 text-center">
+              Trusted by innovative teams worldwide
+            </p>
+            <div className="flex flex-wrap justify-center items-center gap-6">
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/50 backdrop-blur-sm border hover:bg-background/70 transition-colors duration-300">
                 <div className="h-6 w-6">
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
                     className="w-full h-full"
+                    aria-label="TechCorp logo"
                   >
                     <rect width="24" height="24" rx="6" fill="#3B82F6" />
-                    <path
-                      d="M6 8L12 16L18 8"
-                      stroke="white"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
+                    <path d="M8 12L12 8L16 12L12 16L8 12Z" fill="white" />
+                    <circle cx="12" cy="12" r="2" fill="#3B82F6" />
                   </svg>
                 </div>
                 <span className="text-sm font-medium text-muted-foreground">
-                  TechFlow
+                  TechCorp
                 </span>
               </div>
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/50 backdrop-blur-sm border hover:bg-background/70 transition-colors duration-300">
@@ -167,6 +165,7 @@ export function Hero() {
                     viewBox="0 0 24 24"
                     fill="none"
                     className="w-full h-full"
+                    aria-label="InnovateLab logo"
                   >
                     <rect width="24" height="24" rx="6" fill="#10B981" />
                     <circle cx="12" cy="12" r="4" fill="white" />
@@ -183,6 +182,7 @@ export function Hero() {
                     viewBox="0 0 24 24"
                     fill="none"
                     className="w-full h-full"
+                    aria-label="DataSync logo"
                   >
                     <rect width="24" height="24" rx="6" fill="#8B5CF6" />
                     <path d="M8 12L12 8L16 12L12 16L8 12Z" fill="white" />
@@ -199,6 +199,7 @@ export function Hero() {
                     viewBox="0 0 24 24"
                     fill="none"
                     className="w-full h-full"
+                    aria-label="CloudScale logo"
                   >
                     <rect width="24" height="24" rx="6" fill="#F59E0B" />
                     <path
