@@ -1,6 +1,7 @@
 // Route paths configuration
 export const ROUTES = {
   // Public routes
+  LANDING: "/",
   LOGIN: "/login",
   SIGNUP: "/signup",
   FORGOT_PASSWORD: "/forgot-password",
@@ -30,6 +31,7 @@ export const ROUTES = {
 // Route configuration for navigation
 export const NAVIGATION_ROUTES = {
   public: [
+    { path: ROUTES.LANDING, label: "Home" },
     { path: ROUTES.LOGIN, label: "Login" },
     { path: ROUTES.SIGNUP, label: "Signup" },
     { path: ROUTES.FORGOT_PASSWORD, label: "Forgot Password" },

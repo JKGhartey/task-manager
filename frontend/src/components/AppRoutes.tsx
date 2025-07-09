@@ -6,6 +6,7 @@ import ChangePassword from "../pages/Auth/ChangePassword";
 import CreateTask from "../pages/Admin/CreateTask";
 import EditTask from "../pages/Admin/EditTask";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
+import Landing from "../pages/Landing";
 // Auth Pages
 import Login from "../pages/Auth/Login";
 import ManageTasks from "../pages/Admin/ManageTasks";
@@ -43,15 +44,16 @@ export function AppRoutes() {
   return (
     <Routes>
       {/* Public Routes */}
+      <Route path={ROUTES.LANDING} element={<Landing />} />
       <Route path={ROUTES.LOGIN} element={<Login />} />
       <Route path={ROUTES.SIGNUP} element={<Signup />} />
       <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
       <Route path={ROUTES.RESET_PASSWORD} element={<ResetPassword />} />
       <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmail />} />
 
-      {/* Redirect root to appropriate dashboard */}
+      {/* Redirect authenticated users to appropriate dashboard */}
       <Route
-        path="/"
+        path="/dashboard"
         element={
           isAuthenticated ? (
             userRole === "admin" ? (
