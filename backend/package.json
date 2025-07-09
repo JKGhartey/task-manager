@@ -7,7 +7,7 @@
   "type": "commonjs",
   "main": "server.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --noEmitOnError && echo 'Build completed successfully'",
     "start": "node dist/server.js",
     "dev": "nodemon server.ts",
     "create-admin": "node scripts/createAdmin.js"
