@@ -98,6 +98,18 @@ The API uses JWT (JSON Web Tokens) for authentication. Most endpoints require au
 | PATCH  | `/api/users/:id/role`   | Update user role    | Yes (Admin)   |
 | GET    | `/api/users/stats`      | Get user statistics | Yes (Admin)   |
 
+### Department Endpoints
+
+| Method | Endpoint                  | Description            | Auth Required |
+| ------ | ------------------------- | ---------------------- | ------------- |
+| GET    | `/api/departments`        | Get all departments    | Yes (Admin)   |
+| GET    | `/api/departments/stats`  | Get department stats   | Yes (Admin)   |
+| GET    | `/api/departments/active` | Get active departments | Yes (Admin)   |
+| GET    | `/api/departments/:id`    | Get department by ID   | Yes (Admin)   |
+| POST   | `/api/departments`        | Create new department  | Yes (Admin)   |
+| PUT    | `/api/departments/:id`    | Update department      | Yes (Admin)   |
+| DELETE | `/api/departments/:id`    | Delete department      | Yes (Admin)   |
+
 ### Report Endpoints
 
 | Method | Endpoint                         | Description            | Auth Required |
@@ -126,6 +138,30 @@ The API uses JWT (JSON Web Tokens) for authentication. Most endpoints require au
   "department": "string",
   "position": "string",
   "isEmailVerified": "boolean",
+  "createdAt": "date",
+  "updatedAt": "date"
+}
+```
+
+### Department Model
+
+```json
+{
+  "_id": "string",
+  "name": "string",
+  "description": "string",
+  "manager": {
+    "_id": "string",
+    "firstName": "string",
+    "lastName": "string",
+    "email": "string",
+    "avatar": "string"
+  },
+  "status": "active|inactive|archived",
+  "code": "string",
+  "location": "string",
+  "budget": "number",
+  "employeeCount": "number",
   "createdAt": "date",
   "updatedAt": "date"
 }

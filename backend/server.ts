@@ -2,15 +2,15 @@
 import authRoutes from "./routes/authRoutes";
 import { connectDB } from "./config/db";
 import cors from "cors";
+import departmentRoutes from "./routes/departmentRoutes";
 import dotenv from "dotenv";
 import express from "express";
-import swaggerUi from "swagger-ui-express";
 import reportRoutes from "./routes/reportRoutes";
-import taskRoutes from "./routes/taskRoutes";
-import userRoutes from "./routes/userRoutes";
-
 // Import Swagger configuration
 import { specs } from "./config/swagger";
+import swaggerUi from "swagger-ui-express";
+import taskRoutes from "./routes/taskRoutes";
+import userRoutes from "./routes/userRoutes";
 
 // Load environment variables
 dotenv.config();
@@ -63,6 +63,7 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/departments", departmentRoutes);
 app.use("/api/reports", reportRoutes);
 
 // Error handling middleware

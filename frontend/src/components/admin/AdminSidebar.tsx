@@ -60,7 +60,7 @@ const adminData = {
     },
     {
       title: "Department Management",
-      url: "#",
+      url: ROUTES.ADMIN.MANAGE_DEPARTMENTS,
       icon: IconBuilding,
     },
     {

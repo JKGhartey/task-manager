@@ -9,6 +9,7 @@ import ForgotPassword from "../pages/Auth/ForgotPassword";
 import Landing from "../pages/Landing";
 // Auth Pages
 import Login from "../pages/Auth/Login";
+import ManageDepartments from "../pages/Admin/ManageDepartments";
 import ManageTasks from "../pages/Admin/ManageTasks";
 import ManageUsers from "../pages/Admin/ManageUsers";
 import MyTasks from "../pages/User/MyTasks";
@@ -79,6 +80,10 @@ export function AppRoutes() {
         <Route path={ROUTES.ADMIN.CREATE_TASK} element={<CreateTask />} />
         <Route path={ROUTES.ADMIN.MANAGE_TASKS} element={<ManageTasks />} />
         <Route path={ROUTES.ADMIN.MANAGE_USERS} element={<ManageUsers />} />
+        <Route
+          path={ROUTES.ADMIN.MANAGE_DEPARTMENTS}
+          element={<ManageDepartments />}
+        />
         <Route path={ROUTES.ADMIN.SYSTEM_HEALTH} element={<SystemHealth />} />
         <Route
           path={ROUTES.ADMIN.SYSTEM_ANALYTICS}
