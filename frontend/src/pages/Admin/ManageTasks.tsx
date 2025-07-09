@@ -97,7 +97,9 @@ const ManageTasks = () => {
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [viewingTask, setViewingTask] = useState<Task | null>(null);
 
   // Form states
   const [createFormData, setCreateFormData] = useState<CreateTaskData>({
@@ -250,6 +252,17 @@ const ManageTasks = () => {
     } catch (error) {
       console.error("Failed to fetch task:", error);
       toast.error("Failed to load task");
+    }
+  };
+
+  const handleView = async (taskId: string) => {
+    try {
+      const taskData = await taskService.getTaskById(taskId);
+      setViewingTask(taskData);
+      setShowViewModal(true);
+    } catch (error) {
+      console.error("Failed to fetch task:", error);
+      toast.error("Failed to load task details");
     }
   };
 
@@ -504,6 +517,7 @@ const ManageTasks = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Title</TableHead>
+                    <TableHead>Type</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Priority</TableHead>
                     <TableHead>Assignee</TableHead>
@@ -519,10 +533,77 @@ const ManageTasks = () => {
                         {task.title}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{task.status}</Badge>
+                        <Badge
+                          variant="outline"
+                          className={
+                            task.type === "bug"
+                              ? "bg-red-100 text-red-800 border-red-200"
+                              : task.type === "feature"
+                              ? "bg-blue-100 text-blue-800 border-blue-200"
+                              : task.type === "improvement"
+                              ? "bg-green-100 text-green-800 border-green-200"
+                              : task.type === "documentation"
+                              ? "bg-purple-100 text-purple-800 border-purple-200"
+                              : task.type === "maintenance"
+                              ? "bg-orange-100 text-orange-800 border-orange-200"
+                              : "bg-gray-100 text-gray-800 border-gray-200"
+                          }
+                        >
+                          {task.type.charAt(0).toUpperCase() +
+                            task.type.slice(1)}
+                        </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{task.priority}</Badge>
+                        <Badge
+                          variant={
+                            task.status === "done"
+                              ? "default"
+                              : task.status === "cancelled"
+                              ? "destructive"
+                              : "secondary"
+                          }
+                          className={
+                            task.status === "done"
+                              ? "bg-green-100 text-green-800"
+                              : task.status === "in_progress"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : task.status === "review"
+                              ? "bg-orange-100 text-orange-800"
+                              : task.status === "testing"
+                              ? "bg-purple-100 text-purple-800"
+                              : task.status === "cancelled"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-gray-100 text-gray-800"
+                          }
+                        >
+                          {task.status === "in_progress"
+                            ? "Pending"
+                            : task.status.charAt(0).toUpperCase() +
+                              task.status.slice(1)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            task.priority === "urgent"
+                              ? "destructive"
+                              : task.priority === "high"
+                              ? "default"
+                              : "secondary"
+                          }
+                          className={
+                            task.priority === "urgent"
+                              ? "bg-red-100 text-red-800"
+                              : task.priority === "high"
+                              ? "bg-orange-100 text-orange-800"
+                              : task.priority === "medium"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-green-100 text-green-800"
+                          }
+                        >
+                          {task.priority.charAt(0).toUpperCase() +
+                            task.priority.slice(1)}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         {task.assignee.firstName} {task.assignee.lastName}
@@ -540,9 +621,7 @@ const ManageTasks = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() =>
-                              (window.location.href = `/tasks/${task._id}`)
-                            }
+                            onClick={() => handleView(task._id)}
                           >
                             <IconEye className="w-4 h-4" />
                           </Button>
@@ -601,26 +680,28 @@ const ManageTasks = () => {
 
         {/* Create Task Modal */}
         <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader className="pb-4">
-              <DialogTitle className="text-2xl font-bold">
+          <DialogContent className="w-[40vw] max-h-[95vh] overflow-y-auto">
+            <DialogHeader className="pb-6">
+              <DialogTitle className="text-3xl font-bold">
                 Create New Task
               </DialogTitle>
-              <DialogDescription className="text-base">
+              <DialogDescription className="text-lg">
                 Fill in the details below to create a new task.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-8">
+            <div className="space-y-10">
               {/* Basic Information Section */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 pb-2 border-b">
-                  <IconUsers className="w-5 h-5 text-primary" />
-                  <h3 className="text-lg font-semibold">Basic Information</h3>
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 pb-3 border-b-2">
+                  <IconUsers className="w-6 h-6 text-primary" />
+                  <h3 className="text-xl font-semibold">Basic Information</h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2">
-                    <Label htmlFor="title">Task Title *</Label>
+                <div className="space-y-6">
+                  <div>
+                    <Label htmlFor="title" className="text-base font-medium">
+                      Task Title *
+                    </Label>
                     <Input
                       id="title"
                       value={createFormData.title}
@@ -631,11 +712,17 @@ const ManageTasks = () => {
                         })
                       }
                       placeholder="Enter task title"
+                      className="mt-2 h-12 text-base"
                     />
                   </div>
 
-                  <div className="md:col-span-2">
-                    <Label htmlFor="description">Description *</Label>
+                  <div>
+                    <Label
+                      htmlFor="description"
+                      className="text-base font-medium"
+                    >
+                      Description *
+                    </Label>
                     <Textarea
                       id="description"
                       value={createFormData.description}
@@ -646,78 +733,92 @@ const ManageTasks = () => {
                         })
                       }
                       placeholder="Enter task description"
-                      rows={4}
+                      rows={5}
+                      className="mt-2 text-base"
                     />
                   </div>
 
-                  <div>
-                    <Label htmlFor="type">Type</Label>
-                    <Select
-                      value={createFormData.type}
-                      onValueChange={(value) =>
-                        setCreateFormData({
-                          ...createFormData,
-                          type: value as
-                            | "feature"
-                            | "bug"
-                            | "improvement"
-                            | "documentation"
-                            | "maintenance",
-                        })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="feature">Feature</SelectItem>
-                        <SelectItem value="bug">Bug</SelectItem>
-                        <SelectItem value="improvement">Improvement</SelectItem>
-                        <SelectItem value="task">Task</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                      <Label htmlFor="type" className="text-base font-medium">
+                        Type
+                      </Label>
+                      <Select
+                        value={createFormData.type}
+                        onValueChange={(value) =>
+                          setCreateFormData({
+                            ...createFormData,
+                            type: value as
+                              | "feature"
+                              | "bug"
+                              | "improvement"
+                              | "documentation"
+                              | "maintenance",
+                          })
+                        }
+                      >
+                        <SelectTrigger className="mt-2 h-12 text-base">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="feature">Feature</SelectItem>
+                          <SelectItem value="bug">Bug</SelectItem>
+                          <SelectItem value="improvement">
+                            Improvement
+                          </SelectItem>
+                          <SelectItem value="task">Task</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  <div>
-                    <Label htmlFor="priority">Priority</Label>
-                    <Select
-                      value={createFormData.priority}
-                      onValueChange={(value) =>
-                        setCreateFormData({
-                          ...createFormData,
-                          priority: value as
-                            | "low"
-                            | "medium"
-                            | "high"
-                            | "urgent",
-                        })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div>
+                      <Label
+                        htmlFor="priority"
+                        className="text-base font-medium"
+                      >
+                        Priority
+                      </Label>
+                      <Select
+                        value={createFormData.priority}
+                        onValueChange={(value) =>
+                          setCreateFormData({
+                            ...createFormData,
+                            priority: value as
+                              | "low"
+                              | "medium"
+                              | "high"
+                              | "urgent",
+                          })
+                        }
+                      >
+                        <SelectTrigger className="mt-2 h-12 text-base">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="urgent">Urgent</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Assignment & Organization Section */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 pb-2 border-b">
-                  <IconSettings className="w-5 h-5 text-primary" />
-                  <h3 className="text-lg font-semibold">
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 pb-3 border-b-2">
+                  <IconSettings className="w-6 h-6 text-primary" />
+                  <h3 className="text-xl font-semibold">
                     Assignment & Organization
                   </h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <Label htmlFor="assignee">Assignee *</Label>
+                    <Label htmlFor="assignee" className="text-base font-medium">
+                      Assignee *
+                    </Label>
                     <Select
                       value={createFormData.assignee}
                       onValueChange={(value) =>
@@ -727,7 +828,7 @@ const ManageTasks = () => {
                         })
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="mt-2 h-12 text-base">
                         <SelectValue placeholder="Select assignee" />
                       </SelectTrigger>
                       <SelectContent>
@@ -741,14 +842,16 @@ const ManageTasks = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="project">Project</Label>
+                    <Label htmlFor="project" className="text-base font-medium">
+                      Project
+                    </Label>
                     <Select
                       value={createFormData.project}
                       onValueChange={(value) =>
                         setCreateFormData({ ...createFormData, project: value })
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="mt-2 h-12 text-base">
                         <SelectValue placeholder="Select project" />
                       </SelectTrigger>
                       <SelectContent>
@@ -763,7 +866,12 @@ const ManageTasks = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="department">Department</Label>
+                    <Label
+                      htmlFor="department"
+                      className="text-base font-medium"
+                    >
+                      Department
+                    </Label>
                     <Select
                       value={createFormData.department}
                       onValueChange={(value) =>
@@ -773,7 +881,7 @@ const ManageTasks = () => {
                         })
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="mt-2 h-12 text-base">
                         <SelectValue placeholder="Select department" />
                       </SelectTrigger>
                       <SelectContent>
@@ -788,7 +896,9 @@ const ManageTasks = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="dueDate">Due Date</Label>
+                    <Label htmlFor="dueDate" className="text-base font-medium">
+                      Due Date
+                    </Label>
                     <Input
                       id="dueDate"
                       type="date"
@@ -799,11 +909,17 @@ const ManageTasks = () => {
                           dueDate: e.target.value,
                         })
                       }
+                      className="mt-2 h-12 text-base"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="estimatedHours">Estimated Hours</Label>
+                    <Label
+                      htmlFor="estimatedHours"
+                      className="text-base font-medium"
+                    >
+                      Estimated Hours
+                    </Label>
                     <Input
                       id="estimatedHours"
                       type="number"
@@ -817,26 +933,30 @@ const ManageTasks = () => {
                         })
                       }
                       placeholder="Enter estimated hours"
+                      className="mt-2 h-12 text-base"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Additional Details Section */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 pb-2 border-b">
-                  <IconTag className="w-5 h-5 text-primary" />
-                  <h3 className="text-lg font-semibold">Additional Details</h3>
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 pb-3 border-b-2">
+                  <IconTag className="w-6 h-6 text-primary" />
+                  <h3 className="text-xl font-semibold">Additional Details</h3>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
-                    <Label htmlFor="tags">Tags</Label>
-                    <div className="flex gap-2 mb-2">
+                    <Label htmlFor="tags" className="text-base font-medium">
+                      Tags
+                    </Label>
+                    <div className="flex gap-3 mt-2">
                       <Input
                         id="tags"
                         value={tagInput}
                         onChange={(e) => setTagInput(e.target.value)}
                         placeholder="Add a tag"
+                        className="h-12 text-base"
                         onKeyPress={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
@@ -848,16 +968,17 @@ const ManageTasks = () => {
                         type="button"
                         variant="outline"
                         onClick={() => handleAddTag("create")}
+                        className="h-12 px-6"
                       >
                         Add
                       </Button>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 mt-3">
                       {createFormData.tags?.map((tag) => (
                         <Badge
                           key={tag}
                           variant="secondary"
-                          className="flex items-center gap-1"
+                          className="flex items-center gap-1 px-3 py-1 text-sm"
                         >
                           {tag}
                           <button
@@ -871,7 +992,7 @@ const ManageTasks = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-3">
                     <Checkbox
                       id="isPublic"
                       checked={createFormData.isPublic}
@@ -881,47 +1002,58 @@ const ManageTasks = () => {
                           isPublic: !!checked,
                         })
                       }
+                      className="w-5 h-5"
                     />
-                    <Label htmlFor="isPublic">Make this task public</Label>
+                    <Label htmlFor="isPublic" className="text-base">
+                      Make this task public
+                    </Label>
                   </div>
                 </div>
               </div>
             </div>
 
-            <DialogFooter className="pt-6 border-t">
+            <DialogFooter className="pt-8 border-t-2">
               <Button
                 variant="outline"
                 onClick={() => setShowCreateModal(false)}
+                className="h-12 px-8"
               >
                 Cancel
               </Button>
-              <Button onClick={handleCreateSubmit}>Create Task</Button>
+              <Button onClick={handleCreateSubmit} className="h-12 px-8">
+                Create Task
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
         {/* Edit Task Modal */}
         <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader className="pb-4">
-              <DialogTitle className="text-2xl font-bold">
+          <DialogContent className="w-[40vw] max-h-[95vh] overflow-y-auto">
+            <DialogHeader className="pb-6">
+              <DialogTitle className="text-3xl font-bold">
                 Edit Task
               </DialogTitle>
-              <DialogDescription className="text-base">
+              <DialogDescription className="text-lg">
                 Update task information and details.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-8">
+            <div className="space-y-10">
               {/* Basic Information Section */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 pb-2 border-b">
-                  <IconUsers className="w-5 h-5 text-primary" />
-                  <h3 className="text-lg font-semibold">Basic Information</h3>
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 pb-3 border-b-2">
+                  <IconUsers className="w-6 h-6 text-primary" />
+                  <h3 className="text-xl font-semibold">Basic Information</h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2">
-                    <Label htmlFor="edit-title">Task Title *</Label>
+                <div className="space-y-6">
+                  <div>
+                    <Label
+                      htmlFor="edit-title"
+                      className="text-base font-medium"
+                    >
+                      Task Title *
+                    </Label>
                     <Input
                       id="edit-title"
                       value={editFormData.title || ""}
@@ -932,11 +1064,17 @@ const ManageTasks = () => {
                         })
                       }
                       placeholder="Enter task title"
+                      className="mt-2 h-12 text-base"
                     />
                   </div>
 
-                  <div className="md:col-span-2">
-                    <Label htmlFor="edit-description">Description *</Label>
+                  <div>
+                    <Label
+                      htmlFor="edit-description"
+                      className="text-base font-medium"
+                    >
+                      Description *
+                    </Label>
                     <Textarea
                       id="edit-description"
                       value={editFormData.description || ""}
@@ -947,85 +1085,105 @@ const ManageTasks = () => {
                         })
                       }
                       placeholder="Enter task description"
-                      rows={4}
+                      rows={5}
+                      className="mt-2 text-base"
                     />
                   </div>
 
-                  <div>
-                    <Label htmlFor="edit-type">Type</Label>
-                    <Select
-                      value={editFormData.type || "feature"}
-                      onValueChange={(value) =>
-                        setEditFormData({
-                          ...editFormData,
-                          type: value as
-                            | "feature"
-                            | "bug"
-                            | "improvement"
-                            | "documentation"
-                            | "maintenance",
-                        })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="feature">Feature</SelectItem>
-                        <SelectItem value="bug">Bug</SelectItem>
-                        <SelectItem value="improvement">Improvement</SelectItem>
-                        <SelectItem value="task">Task</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                      <Label
+                        htmlFor="edit-type"
+                        className="text-base font-medium"
+                      >
+                        Type
+                      </Label>
+                      <Select
+                        value={editFormData.type || "feature"}
+                        onValueChange={(value) =>
+                          setEditFormData({
+                            ...editFormData,
+                            type: value as
+                              | "feature"
+                              | "bug"
+                              | "improvement"
+                              | "documentation"
+                              | "maintenance",
+                          })
+                        }
+                      >
+                        <SelectTrigger className="mt-2 h-12 text-base">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="feature">Feature</SelectItem>
+                          <SelectItem value="bug">Bug</SelectItem>
+                          <SelectItem value="improvement">
+                            Improvement
+                          </SelectItem>
+                          <SelectItem value="task">Task</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  <div>
-                    <Label htmlFor="edit-priority">Priority</Label>
-                    <Select
-                      value={editFormData.priority || "medium"}
-                      onValueChange={(value) =>
-                        setEditFormData({
-                          ...editFormData,
-                          priority: value as
-                            | "low"
-                            | "medium"
-                            | "high"
-                            | "urgent",
-                        })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">Low</SelectItem>
-                        <SelectItem value="medium">Medium</SelectItem>
-                        <SelectItem value="high">High</SelectItem>
-                        <SelectItem value="urgent">Urgent</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div>
+                      <Label
+                        htmlFor="edit-priority"
+                        className="text-base font-medium"
+                      >
+                        Priority
+                      </Label>
+                      <Select
+                        value={editFormData.priority || "medium"}
+                        onValueChange={(value) =>
+                          setEditFormData({
+                            ...editFormData,
+                            priority: value as
+                              | "low"
+                              | "medium"
+                              | "high"
+                              | "urgent",
+                          })
+                        }
+                      >
+                        <SelectTrigger className="mt-2 h-12 text-base">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="urgent">Urgent</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Assignment & Organization Section */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 pb-2 border-b">
-                  <IconSettings className="w-5 h-5 text-primary" />
-                  <h3 className="text-lg font-semibold">
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 pb-3 border-b-2">
+                  <IconSettings className="w-6 h-6 text-primary" />
+                  <h3 className="text-xl font-semibold">
                     Assignment & Organization
                   </h3>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <Label htmlFor="edit-assignee">Assignee *</Label>
+                    <Label
+                      htmlFor="edit-assignee"
+                      className="text-base font-medium"
+                    >
+                      Assignee *
+                    </Label>
                     <Select
                       value={editFormData.assignee || ""}
                       onValueChange={(value) =>
                         setEditFormData({ ...editFormData, assignee: value })
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="mt-2 h-12 text-base">
                         <SelectValue placeholder="Select assignee" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1039,14 +1197,19 @@ const ManageTasks = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="edit-project">Project</Label>
+                    <Label
+                      htmlFor="edit-project"
+                      className="text-base font-medium"
+                    >
+                      Project
+                    </Label>
                     <Select
                       value={editFormData.project || "none"}
                       onValueChange={(value) =>
                         setEditFormData({ ...editFormData, project: value })
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="mt-2 h-12 text-base">
                         <SelectValue placeholder="Select project" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1061,14 +1224,19 @@ const ManageTasks = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="edit-department">Department</Label>
+                    <Label
+                      htmlFor="edit-department"
+                      className="text-base font-medium"
+                    >
+                      Department
+                    </Label>
                     <Select
                       value={editFormData.department || "none"}
                       onValueChange={(value) =>
                         setEditFormData({ ...editFormData, department: value })
                       }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="mt-2 h-12 text-base">
                         <SelectValue placeholder="Select department" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1083,7 +1251,12 @@ const ManageTasks = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="edit-dueDate">Due Date</Label>
+                    <Label
+                      htmlFor="edit-dueDate"
+                      className="text-base font-medium"
+                    >
+                      Due Date
+                    </Label>
                     <Input
                       id="edit-dueDate"
                       type="date"
@@ -1094,11 +1267,17 @@ const ManageTasks = () => {
                           dueDate: e.target.value,
                         })
                       }
+                      className="mt-2 h-12 text-base"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="edit-estimatedHours">Estimated Hours</Label>
+                    <Label
+                      htmlFor="edit-estimatedHours"
+                      className="text-base font-medium"
+                    >
+                      Estimated Hours
+                    </Label>
                     <Input
                       id="edit-estimatedHours"
                       type="number"
@@ -1112,26 +1291,33 @@ const ManageTasks = () => {
                         })
                       }
                       placeholder="Enter estimated hours"
+                      className="mt-2 h-12 text-base"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Additional Details Section */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 pb-2 border-b">
-                  <IconTag className="w-5 h-5 text-primary" />
-                  <h3 className="text-lg font-semibold">Additional Details</h3>
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 pb-3 border-b-2">
+                  <IconTag className="w-6 h-6 text-primary" />
+                  <h3 className="text-xl font-semibold">Additional Details</h3>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
-                    <Label htmlFor="edit-tags">Tags</Label>
-                    <div className="flex gap-2 mb-2">
+                    <Label
+                      htmlFor="edit-tags"
+                      className="text-base font-medium"
+                    >
+                      Tags
+                    </Label>
+                    <div className="flex gap-3 mt-2">
                       <Input
                         id="edit-tags"
                         value={tagInput}
                         onChange={(e) => setTagInput(e.target.value)}
                         placeholder="Add a tag"
+                        className="h-12 text-base"
                         onKeyPress={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
@@ -1143,16 +1329,17 @@ const ManageTasks = () => {
                         type="button"
                         variant="outline"
                         onClick={() => handleAddTag("edit")}
+                        className="h-12 px-6"
                       >
                         Add
                       </Button>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 mt-3">
                       {editFormData.tags?.map((tag) => (
                         <Badge
                           key={tag}
                           variant="secondary"
-                          className="flex items-center gap-1"
+                          className="flex items-center gap-1 px-3 py-1 text-sm"
                         >
                           {tag}
                           <button
@@ -1166,7 +1353,7 @@ const ManageTasks = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-3">
                     <Checkbox
                       id="edit-isPublic"
                       checked={editFormData.isPublic || false}
@@ -1176,18 +1363,375 @@ const ManageTasks = () => {
                           isPublic: !!checked,
                         })
                       }
+                      className="w-5 h-5"
                     />
-                    <Label htmlFor="edit-isPublic">Make this task public</Label>
+                    <Label htmlFor="edit-isPublic" className="text-base">
+                      Make this task public
+                    </Label>
                   </div>
                 </div>
               </div>
             </div>
 
-            <DialogFooter className="pt-6 border-t">
-              <Button variant="outline" onClick={() => setShowEditModal(false)}>
+            <DialogFooter className="pt-8 border-t-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowEditModal(false)}
+                className="h-12 px-8"
+              >
                 Cancel
               </Button>
-              <Button onClick={handleEditSubmit}>Update Task</Button>
+              <Button onClick={handleEditSubmit} className="h-12 px-8">
+                Update Task
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* View Task Modal */}
+        <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
+          <DialogContent className="w-[40vw] max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="pb-6">
+              <DialogTitle className="text-3xl font-bold">
+                Task Details
+              </DialogTitle>
+              <DialogDescription className="text-lg">
+                View complete task information.
+              </DialogDescription>
+            </DialogHeader>
+
+            {viewingTask && (
+              <div className="space-y-8">
+                {/* Basic Information Section */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 pb-3 border-b-2">
+                    <IconUsers className="w-6 h-6 text-primary" />
+                    <h3 className="text-xl font-semibold">Basic Information</h3>
+                  </div>
+                  <div className="space-y-6">
+                    <div>
+                      <Label className="text-base font-medium text-muted-foreground">
+                        Task Title
+                      </Label>
+                      <p className="mt-2 text-lg font-semibold">
+                        {viewingTask.title}
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label className="text-base font-medium text-muted-foreground">
+                        Description
+                      </Label>
+                      <p className="mt-2 text-base whitespace-pre-wrap">
+                        {viewingTask.description}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div>
+                        <Label className="text-base font-medium text-muted-foreground">
+                          Type
+                        </Label>
+                        <Badge
+                          variant="outline"
+                          className={`mt-2 ${
+                            viewingTask.type === "bug"
+                              ? "bg-red-100 text-red-800 border-red-200"
+                              : viewingTask.type === "feature"
+                              ? "bg-blue-100 text-blue-800 border-blue-200"
+                              : viewingTask.type === "improvement"
+                              ? "bg-green-100 text-green-800 border-green-200"
+                              : viewingTask.type === "documentation"
+                              ? "bg-purple-100 text-purple-800 border-purple-200"
+                              : viewingTask.type === "maintenance"
+                              ? "bg-orange-100 text-orange-800 border-orange-200"
+                              : "bg-gray-100 text-gray-800 border-gray-200"
+                          }`}
+                        >
+                          {viewingTask.type.charAt(0).toUpperCase() +
+                            viewingTask.type.slice(1)}
+                        </Badge>
+                      </div>
+
+                      <div>
+                        <Label className="text-base font-medium text-muted-foreground">
+                          Priority
+                        </Label>
+                        <Badge
+                          variant="outline"
+                          className={`mt-2 ${
+                            viewingTask.priority === "urgent"
+                              ? "bg-red-100 text-red-800 border-red-200"
+                              : viewingTask.priority === "high"
+                              ? "bg-orange-100 text-orange-800 border-orange-200"
+                              : viewingTask.priority === "medium"
+                              ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                              : "bg-green-100 text-green-800 border-green-200"
+                          }`}
+                        >
+                          {viewingTask.priority.charAt(0).toUpperCase() +
+                            viewingTask.priority.slice(1)}
+                        </Badge>
+                      </div>
+
+                      <div>
+                        <Label className="text-base font-medium text-muted-foreground">
+                          Status
+                        </Label>
+                        <Badge
+                          variant="outline"
+                          className={`mt-2 ${
+                            viewingTask.status === "done"
+                              ? "bg-green-100 text-green-800 border-green-200"
+                              : viewingTask.status === "in_progress"
+                              ? "bg-yellow-100 text-yellow-800 border-yellow-200"
+                              : viewingTask.status === "review"
+                              ? "bg-orange-100 text-orange-800 border-orange-200"
+                              : viewingTask.status === "testing"
+                              ? "bg-purple-100 text-purple-800 border-purple-200"
+                              : viewingTask.status === "cancelled"
+                              ? "bg-red-100 text-red-800 border-red-200"
+                              : "bg-gray-100 text-gray-800 border-gray-200"
+                          }`}
+                        >
+                          {viewingTask.status === "in_progress"
+                            ? "Pending"
+                            : viewingTask.status.charAt(0).toUpperCase() +
+                              viewingTask.status.slice(1)}
+                        </Badge>
+                      </div>
+
+                      <div>
+                        <Label className="text-base font-medium text-muted-foreground">
+                          Progress
+                        </Label>
+                        <div className="mt-2">
+                          <div className="w-full bg-muted rounded-full h-2">
+                            <div
+                              className="bg-primary h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${viewingTask.progress}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-sm text-muted-foreground mt-1">
+                            {viewingTask.progress}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Assignment & Organization Section */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 pb-3 border-b-2">
+                    <IconSettings className="w-6 h-6 text-primary" />
+                    <h3 className="text-xl font-semibold">
+                      Assignment & Organization
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                      <Label className="text-base font-medium text-muted-foreground">
+                        Assignee
+                      </Label>
+                      <p className="mt-2 text-base">
+                        {viewingTask.assignee.firstName}{" "}
+                        {viewingTask.assignee.lastName}
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label className="text-base font-medium text-muted-foreground">
+                        Created By
+                      </Label>
+                      <p className="mt-2 text-base">
+                        {viewingTask.createdBy.firstName}{" "}
+                        {viewingTask.createdBy.lastName}
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label className="text-base font-medium text-muted-foreground">
+                        Project
+                      </Label>
+                      <p className="mt-2 text-base">
+                        {viewingTask.project || "No project assigned"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label className="text-base font-medium text-muted-foreground">
+                        Department
+                      </Label>
+                      <p className="mt-2 text-base">
+                        {viewingTask.department || "No department assigned"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label className="text-base font-medium text-muted-foreground">
+                        Due Date
+                      </Label>
+                      <p className="mt-2 text-base">
+                        {viewingTask.dueDate
+                          ? new Date(viewingTask.dueDate).toLocaleDateString()
+                          : "No due date"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label className="text-base font-medium text-muted-foreground">
+                        Estimated Hours
+                      </Label>
+                      <p className="mt-2 text-base">
+                        {viewingTask.estimatedHours
+                          ? `${viewingTask.estimatedHours} hours`
+                          : "Not specified"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label className="text-base font-medium text-muted-foreground">
+                        Actual Hours
+                      </Label>
+                      <p className="mt-2 text-base">
+                        {viewingTask.actualHours
+                          ? `${viewingTask.actualHours} hours`
+                          : "Not tracked"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label className="text-base font-medium text-muted-foreground">
+                        Created Date
+                      </Label>
+                      <p className="mt-2 text-base">
+                        {new Date(viewingTask.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label className="text-base font-medium text-muted-foreground">
+                        Last Updated
+                      </Label>
+                      <p className="mt-2 text-base">
+                        {new Date(viewingTask.updatedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Details Section */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 pb-3 border-b-2">
+                    <IconTag className="w-6 h-6 text-primary" />
+                    <h3 className="text-xl font-semibold">
+                      Additional Details
+                    </h3>
+                  </div>
+                  <div className="space-y-6">
+                    <div>
+                      <Label className="text-base font-medium text-muted-foreground">
+                        Tags
+                      </Label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {viewingTask.tags && viewingTask.tags.length > 0 ? (
+                          viewingTask.tags.map((tag) => (
+                            <Badge
+                              key={tag}
+                              variant="secondary"
+                              className="px-3 py-1 text-sm"
+                            >
+                              {tag}
+                            </Badge>
+                          ))
+                        ) : (
+                          <p className="text-muted-foreground">
+                            No tags assigned
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-base font-medium text-muted-foreground">
+                        Visibility
+                      </Label>
+                      <p className="mt-2 text-base">
+                        {viewingTask.isPublic ? "Public" : "Private"}
+                      </p>
+                    </div>
+
+                    {viewingTask.subtasks &&
+                      viewingTask.subtasks.length > 0 && (
+                        <div>
+                          <Label className="text-base font-medium text-muted-foreground">
+                            Subtasks
+                          </Label>
+                          <div className="mt-2 space-y-2">
+                            {viewingTask.subtasks.map((subtask, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center gap-2 p-2 bg-muted rounded"
+                              >
+                                <Checkbox
+                                  checked={subtask.completed}
+                                  disabled
+                                />
+                                <span
+                                  className={
+                                    subtask.completed
+                                      ? "line-through text-muted-foreground"
+                                      : ""
+                                  }
+                                >
+                                  {subtask.title}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                    {viewingTask.comments &&
+                      viewingTask.comments.length > 0 && (
+                        <div>
+                          <Label className="text-base font-medium text-muted-foreground">
+                            Comments
+                          </Label>
+                          <div className="mt-2 space-y-3">
+                            {viewingTask.comments.map((comment, index) => (
+                              <div key={index} className="p-3 bg-muted rounded">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="font-medium">
+                                    {comment.user.firstName}{" "}
+                                    {comment.user.lastName}
+                                  </span>
+                                  <span className="text-sm text-muted-foreground">
+                                    {new Date(
+                                      comment.timestamp
+                                    ).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                <p className="text-sm">{comment.content}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <DialogFooter className="pt-8 border-t-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowViewModal(false)}
+                className="h-12 px-8"
+              >
+                Close
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
