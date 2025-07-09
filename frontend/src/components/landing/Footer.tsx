@@ -8,7 +8,7 @@ const footerLinks = {
   product: [
     { name: "Features", href: "#features" },
     { name: "Pricing", href: "#pricing" },
-    { name: "API", href: "#" },
+    { name: "API", href: "https://task-manager-x8af.onrender.com/api-docs/" },
     { name: "Integrations", href: "#" },
   ],
   company: [
@@ -93,29 +93,31 @@ export function Footer() {
           </div>
 
           {/* Product Links */}
-          <div>
+          <div className="text-center">
             <h4 className="font-semibold mb-4">Product</h4>
-            <ul className="space-y-2">
+            <div className="flex flex-col items-center space-y-2">
               {footerLinks.product.map((link) => (
-                <li key={link.name}>
+                <div key={link.name}>
                   {link.href.startsWith("#") ? (
                     <button
                       onClick={() => handleSmoothScroll(link.href)}
-                      className="text-sm text-muted-foreground hover:text-foreground transition-colors text-left"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.name}
                     </button>
                   ) : (
                     <a
                       href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.name}
                     </a>
                   )}
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
 
           {/* Company Links */}
@@ -134,6 +136,8 @@ export function Footer() {
                   ) : (
                     <a
                       href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {link.name}
@@ -152,6 +156,8 @@ export function Footer() {
                 <li key={link.name}>
                   <a
                     href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {link.name}
@@ -169,6 +175,8 @@ export function Footer() {
                 <li key={link.name}>
                   <a
                     href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {link.name}
