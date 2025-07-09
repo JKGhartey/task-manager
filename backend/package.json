@@ -7,7 +7,8 @@
   "type": "commonjs",
   "main": "server.ts",
   "scripts": {
-    "start": "ts-node server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "dev": "nodemon server.ts",
     "create-admin": "node scripts/createAdmin.js"
   },
@@ -24,7 +25,8 @@
     "mongoose": "^8.16.2",
     "multer": "^2.0.1",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "typescript": "^5.8.3"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
