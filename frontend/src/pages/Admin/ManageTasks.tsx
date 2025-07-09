@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -16,22 +18,68 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
+  TableCell,
 } from "@/components/ui/table";
-import { taskService, type Task, type TaskFilters } from "@/utils/taskService";
+import { Badge } from "@/components/ui/badge";
+import {
+  taskService,
+  type Task,
+  type TaskFilters,
+  type CreateTaskData,
+  type UpdateTaskData,
+} from "@/utils/taskService";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
-import { IconSearch, IconPlus, IconUsers } from "@tabler/icons-react";
-import AdminTaskRow from "@/components/admin/AdminTaskRow";
+import {
+  IconSearch,
+  IconPlus,
+  IconUsers,
+  IconEdit,
+  IconTrash,
+  IconEye,
+  IconTag,
+  IconSettings,
+} from "@tabler/icons-react";
+import { getAllProjects, type Project } from "@/utils/projectService";
+import api from "@/utils/axiosInstance";
+
+interface User {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  department?: string;
+  position?: string;
+}
+
+interface Department {
+  _id: string;
+  name: string;
+  description?: string;
+  status: string;
+}
 
 const ManageTasks = () => {
   const { isAuthenticated } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<TaskFilters>({
     page: 1,
@@ -45,6 +93,29 @@ const ManageTasks = () => {
     hasNext: false,
     hasPrev: false,
   });
+
+  // Modal states
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+
+  // Form states
+  const [createFormData, setCreateFormData] = useState<CreateTaskData>({
+    title: "",
+    description: "",
+    type: "feature",
+    priority: "medium",
+    assignee: "",
+    project: "none",
+    department: "none",
+    dueDate: "",
+    estimatedHours: undefined,
+    tags: [],
+    isPublic: false,
+  });
+
+  const [editFormData, setEditFormData] = useState<UpdateTaskData>({});
+  const [tagInput, setTagInput] = useState("");
 
   const fetchTasks = async () => {
     if (!isAuthenticated) {
@@ -64,9 +135,43 @@ const ManageTasks = () => {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const response = await api.get("/users");
+      setUsers(response.data.data.users);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+      toast.error("Failed to load users");
+    }
+  };
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await api.get("/departments/public/active");
+      setDepartments(response.data.data.departments);
+    } catch (error) {
+      console.error("Failed to fetch departments:", error);
+      toast.error("Failed to load departments");
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const projectsData = await getAllProjects();
+      setProjects(projectsData);
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+      toast.error("Failed to load projects");
+    }
+  };
+
   useEffect(() => {
-    fetchTasks();
-    // eslint-disable-next-line
+    if (isAuthenticated) {
+      fetchTasks();
+      fetchUsers();
+      fetchDepartments();
+      fetchProjects();
+    }
   }, [isAuthenticated, filters]);
 
   const handleDeleteTask = async (taskId: string) => {
@@ -102,6 +207,151 @@ const ManageTasks = () => {
     setFilters({ page: 1, limit: 10 });
   };
 
+  // Modal handlers
+  const handleCreate = () => {
+    setCreateFormData({
+      title: "",
+      description: "",
+      type: "feature",
+      priority: "medium",
+      assignee: "",
+      project: "none",
+      department: "none",
+      dueDate: "",
+      estimatedHours: undefined,
+      tags: [],
+      isPublic: false,
+    });
+    setTagInput("");
+    setShowCreateModal(true);
+  };
+
+  const handleEdit = async (taskId: string) => {
+    try {
+      const taskData = await taskService.getTaskById(taskId);
+      setEditingTask(taskData);
+      setEditFormData({
+        title: taskData.title,
+        description: taskData.description,
+        type: taskData.type,
+        priority: taskData.priority,
+        assignee: taskData.assignee._id,
+        project: taskData.project || "none",
+        department: taskData.department || "none",
+        dueDate: taskData.dueDate
+          ? new Date(taskData.dueDate).toISOString().split("T")[0]
+          : "",
+        estimatedHours: taskData.estimatedHours,
+        tags: taskData.tags,
+        isPublic: taskData.isPublic,
+      });
+      setTagInput("");
+      setShowEditModal(true);
+    } catch (error) {
+      console.error("Failed to fetch task:", error);
+      toast.error("Failed to load task");
+    }
+  };
+
+  const handleCreateSubmit = async () => {
+    if (
+      !createFormData.title.trim() ||
+      !createFormData.description.trim() ||
+      !createFormData.assignee
+    ) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      const submitData = {
+        ...createFormData,
+        project:
+          createFormData.project === "none" ? "" : createFormData.project,
+        department:
+          createFormData.department === "none" ? "" : createFormData.department,
+      };
+      await taskService.createTask(submitData);
+      toast.success("Task created successfully");
+      setShowCreateModal(false);
+      fetchTasks();
+    } catch (error: unknown) {
+      console.error("Failed to create task:", error);
+      const message =
+        error instanceof Error ? error.message : "Failed to create task";
+      toast.error(message);
+    }
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editingTask) return;
+
+    if (
+      !editFormData.title?.trim() ||
+      !editFormData.description?.trim() ||
+      !editFormData.assignee
+    ) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      const submitData = {
+        ...editFormData,
+        project: editFormData.project === "none" ? "" : editFormData.project,
+        department:
+          editFormData.department === "none" ? "" : editFormData.department,
+      };
+      await taskService.updateTask(editingTask._id, submitData);
+      toast.success("Task updated successfully");
+      setShowEditModal(false);
+      fetchTasks();
+    } catch (error: unknown) {
+      console.error("Failed to update task:", error);
+      const message =
+        error instanceof Error ? error.message : "Failed to update task";
+      toast.error(message);
+    }
+  };
+
+  const handleAddTag = (formType: "create" | "edit") => {
+    if (tagInput.trim()) {
+      if (formType === "create") {
+        if (!createFormData.tags?.includes(tagInput.trim())) {
+          setCreateFormData((prev) => ({
+            ...prev,
+            tags: [...(prev.tags || []), tagInput.trim()],
+          }));
+        }
+      } else {
+        if (!editFormData.tags?.includes(tagInput.trim())) {
+          setEditFormData((prev) => ({
+            ...prev,
+            tags: [...(prev.tags || []), tagInput.trim()],
+          }));
+        }
+      }
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (
+    tagToRemove: string,
+    formType: "create" | "edit"
+  ) => {
+    if (formType === "create") {
+      setCreateFormData((prev) => ({
+        ...prev,
+        tags: prev.tags?.filter((tag) => tag !== tagToRemove) || [],
+      }));
+    } else {
+      setEditFormData((prev) => ({
+        ...prev,
+        tags: prev.tags?.filter((tag) => tag !== tagToRemove) || [],
+      }));
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <AdminLayout>
@@ -126,7 +376,7 @@ const ManageTasks = () => {
               </p>
             </div>
           </div>
-          <Button onClick={() => (window.location.href = "/admin/create-task")}>
+          <Button onClick={handleCreate}>
             <IconPlus className="w-4 h-4 mr-2" /> Create New Task
           </Button>
         </div>
@@ -264,15 +514,55 @@ const ManageTasks = () => {
                 </TableHeader>
                 <TableBody>
                   {tasks.map((task) => (
-                    <AdminTaskRow
-                      key={task._id}
-                      task={task}
-                      onView={(id) => (window.location.href = `/tasks/${id}`)}
-                      onEdit={(id) =>
-                        (window.location.href = `/admin/edit-task/${id}`)
-                      }
-                      onDelete={handleDeleteTask}
-                    />
+                    <TableRow key={task._id}>
+                      <TableCell className="font-medium">
+                        {task.title}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{task.status}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{task.priority}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        {task.assignee.firstName} {task.assignee.lastName}
+                      </TableCell>
+                      <TableCell>
+                        {task.createdBy.firstName} {task.createdBy.lastName}
+                      </TableCell>
+                      <TableCell>
+                        {task.dueDate
+                          ? new Date(task.dueDate).toLocaleDateString()
+                          : "No due date"}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              (window.location.href = `/tasks/${task._id}`)
+                            }
+                          >
+                            <IconEye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(task._id)}
+                          >
+                            <IconEdit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteTask(task._id)}
+                          >
+                            <IconTrash className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
                   ))}
                 </TableBody>
               </Table>
@@ -308,6 +598,599 @@ const ManageTasks = () => {
             </div>
           </div>
         )}
+
+        {/* Create Task Modal */}
+        <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="pb-4">
+              <DialogTitle className="text-2xl font-bold">
+                Create New Task
+              </DialogTitle>
+              <DialogDescription className="text-base">
+                Fill in the details below to create a new task.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-8">
+              {/* Basic Information Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b">
+                  <IconUsers className="w-5 h-5 text-primary" />
+                  <h3 className="text-lg font-semibold">Basic Information</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <Label htmlFor="title">Task Title *</Label>
+                    <Input
+                      id="title"
+                      value={createFormData.title}
+                      onChange={(e) =>
+                        setCreateFormData({
+                          ...createFormData,
+                          title: e.target.value,
+                        })
+                      }
+                      placeholder="Enter task title"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <Label htmlFor="description">Description *</Label>
+                    <Textarea
+                      id="description"
+                      value={createFormData.description}
+                      onChange={(e) =>
+                        setCreateFormData({
+                          ...createFormData,
+                          description: e.target.value,
+                        })
+                      }
+                      placeholder="Enter task description"
+                      rows={4}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="type">Type</Label>
+                    <Select
+                      value={createFormData.type}
+                      onValueChange={(value) =>
+                        setCreateFormData({
+                          ...createFormData,
+                          type: value as
+                            | "feature"
+                            | "bug"
+                            | "improvement"
+                            | "documentation"
+                            | "maintenance",
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="feature">Feature</SelectItem>
+                        <SelectItem value="bug">Bug</SelectItem>
+                        <SelectItem value="improvement">Improvement</SelectItem>
+                        <SelectItem value="task">Task</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="priority">Priority</Label>
+                    <Select
+                      value={createFormData.priority}
+                      onValueChange={(value) =>
+                        setCreateFormData({
+                          ...createFormData,
+                          priority: value as
+                            | "low"
+                            | "medium"
+                            | "high"
+                            | "urgent",
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="urgent">Urgent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Assignment & Organization Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b">
+                  <IconSettings className="w-5 h-5 text-primary" />
+                  <h3 className="text-lg font-semibold">
+                    Assignment & Organization
+                  </h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="assignee">Assignee *</Label>
+                    <Select
+                      value={createFormData.assignee}
+                      onValueChange={(value) =>
+                        setCreateFormData({
+                          ...createFormData,
+                          assignee: value,
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select assignee" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {users.map((user) => (
+                          <SelectItem key={user._id} value={user._id}>
+                            {user.firstName} {user.lastName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="project">Project</Label>
+                    <Select
+                      value={createFormData.project}
+                      onValueChange={(value) =>
+                        setCreateFormData({ ...createFormData, project: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select project" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No project</SelectItem>
+                        {projects.map((project) => (
+                          <SelectItem key={project._id} value={project._id}>
+                            {project.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="department">Department</Label>
+                    <Select
+                      value={createFormData.department}
+                      onValueChange={(value) =>
+                        setCreateFormData({
+                          ...createFormData,
+                          department: value,
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No department</SelectItem>
+                        {departments.map((dept) => (
+                          <SelectItem key={dept._id} value={dept._id}>
+                            {dept.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="dueDate">Due Date</Label>
+                    <Input
+                      id="dueDate"
+                      type="date"
+                      value={createFormData.dueDate}
+                      onChange={(e) =>
+                        setCreateFormData({
+                          ...createFormData,
+                          dueDate: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="estimatedHours">Estimated Hours</Label>
+                    <Input
+                      id="estimatedHours"
+                      type="number"
+                      value={createFormData.estimatedHours || ""}
+                      onChange={(e) =>
+                        setCreateFormData({
+                          ...createFormData,
+                          estimatedHours: e.target.value
+                            ? parseInt(e.target.value)
+                            : undefined,
+                        })
+                      }
+                      placeholder="Enter estimated hours"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Details Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b">
+                  <IconTag className="w-5 h-5 text-primary" />
+                  <h3 className="text-lg font-semibold">Additional Details</h3>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="tags">Tags</Label>
+                    <div className="flex gap-2 mb-2">
+                      <Input
+                        id="tags"
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        placeholder="Add a tag"
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddTag("create");
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => handleAddTag("create")}
+                      >
+                        Add
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {createFormData.tags?.map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="secondary"
+                          className="flex items-center gap-1"
+                        >
+                          {tag}
+                          <button
+                            onClick={() => handleRemoveTag(tag, "create")}
+                            className="ml-1 hover:text-red-500"
+                          >
+                            ×
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="isPublic"
+                      checked={createFormData.isPublic}
+                      onCheckedChange={(checked) =>
+                        setCreateFormData({
+                          ...createFormData,
+                          isPublic: !!checked,
+                        })
+                      }
+                    />
+                    <Label htmlFor="isPublic">Make this task public</Label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="pt-6 border-t">
+              <Button
+                variant="outline"
+                onClick={() => setShowCreateModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleCreateSubmit}>Create Task</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Task Modal */}
+        <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader className="pb-4">
+              <DialogTitle className="text-2xl font-bold">
+                Edit Task
+              </DialogTitle>
+              <DialogDescription className="text-base">
+                Update task information and details.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-8">
+              {/* Basic Information Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b">
+                  <IconUsers className="w-5 h-5 text-primary" />
+                  <h3 className="text-lg font-semibold">Basic Information</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <Label htmlFor="edit-title">Task Title *</Label>
+                    <Input
+                      id="edit-title"
+                      value={editFormData.title || ""}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          title: e.target.value,
+                        })
+                      }
+                      placeholder="Enter task title"
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <Label htmlFor="edit-description">Description *</Label>
+                    <Textarea
+                      id="edit-description"
+                      value={editFormData.description || ""}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          description: e.target.value,
+                        })
+                      }
+                      placeholder="Enter task description"
+                      rows={4}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="edit-type">Type</Label>
+                    <Select
+                      value={editFormData.type || "feature"}
+                      onValueChange={(value) =>
+                        setEditFormData({
+                          ...editFormData,
+                          type: value as
+                            | "feature"
+                            | "bug"
+                            | "improvement"
+                            | "documentation"
+                            | "maintenance",
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="feature">Feature</SelectItem>
+                        <SelectItem value="bug">Bug</SelectItem>
+                        <SelectItem value="improvement">Improvement</SelectItem>
+                        <SelectItem value="task">Task</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="edit-priority">Priority</Label>
+                    <Select
+                      value={editFormData.priority || "medium"}
+                      onValueChange={(value) =>
+                        setEditFormData({
+                          ...editFormData,
+                          priority: value as
+                            | "low"
+                            | "medium"
+                            | "high"
+                            | "urgent",
+                        })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="urgent">Urgent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Assignment & Organization Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b">
+                  <IconSettings className="w-5 h-5 text-primary" />
+                  <h3 className="text-lg font-semibold">
+                    Assignment & Organization
+                  </h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="edit-assignee">Assignee *</Label>
+                    <Select
+                      value={editFormData.assignee || ""}
+                      onValueChange={(value) =>
+                        setEditFormData({ ...editFormData, assignee: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select assignee" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {users.map((user) => (
+                          <SelectItem key={user._id} value={user._id}>
+                            {user.firstName} {user.lastName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="edit-project">Project</Label>
+                    <Select
+                      value={editFormData.project || "none"}
+                      onValueChange={(value) =>
+                        setEditFormData({ ...editFormData, project: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select project" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No project</SelectItem>
+                        {projects.map((project) => (
+                          <SelectItem key={project._id} value={project._id}>
+                            {project.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="edit-department">Department</Label>
+                    <Select
+                      value={editFormData.department || "none"}
+                      onValueChange={(value) =>
+                        setEditFormData({ ...editFormData, department: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No department</SelectItem>
+                        {departments.map((dept) => (
+                          <SelectItem key={dept._id} value={dept._id}>
+                            {dept.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="edit-dueDate">Due Date</Label>
+                    <Input
+                      id="edit-dueDate"
+                      type="date"
+                      value={editFormData.dueDate || ""}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          dueDate: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="edit-estimatedHours">Estimated Hours</Label>
+                    <Input
+                      id="edit-estimatedHours"
+                      type="number"
+                      value={editFormData.estimatedHours || ""}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          estimatedHours: e.target.value
+                            ? parseInt(e.target.value)
+                            : undefined,
+                        })
+                      }
+                      placeholder="Enter estimated hours"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Details Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b">
+                  <IconTag className="w-5 h-5 text-primary" />
+                  <h3 className="text-lg font-semibold">Additional Details</h3>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="edit-tags">Tags</Label>
+                    <div className="flex gap-2 mb-2">
+                      <Input
+                        id="edit-tags"
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        placeholder="Add a tag"
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddTag("edit");
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => handleAddTag("edit")}
+                      >
+                        Add
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {editFormData.tags?.map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="secondary"
+                          className="flex items-center gap-1"
+                        >
+                          {tag}
+                          <button
+                            onClick={() => handleRemoveTag(tag, "edit")}
+                            className="ml-1 hover:text-red-500"
+                          >
+                            ×
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="edit-isPublic"
+                      checked={editFormData.isPublic || false}
+                      onCheckedChange={(checked) =>
+                        setEditFormData({
+                          ...editFormData,
+                          isPublic: !!checked,
+                        })
+                      }
+                    />
+                    <Label htmlFor="edit-isPublic">Make this task public</Label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <DialogFooter className="pt-6 border-t">
+              <Button variant="outline" onClick={() => setShowEditModal(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleEditSubmit}>Update Task</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );
