@@ -190,7 +190,10 @@ const ViewTaskDetails = () => {
     );
   }
 
-  const canEdit = user?.role === "admin" || task.createdBy._id === user?.id;
+  const canEdit =
+    user?.role === "admin" ||
+    user?.role === "manager" ||
+    task.createdBy._id === user?.id;
 
   return (
     <UserLayout>

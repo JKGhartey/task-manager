@@ -46,7 +46,10 @@ export function VerifyEmailForm({
         toast.success(response.message);
         // Redirect based on user role after successful verification
         setTimeout(() => {
-          if (response.data?.user?.role === "admin") {
+          if (
+            response.data?.user?.role === "admin" ||
+            response.data?.user?.role === "manager"
+          ) {
             navigate(ROUTES.ADMIN.DASHBOARD);
           } else {
             navigate(ROUTES.USER.DASHBOARD);

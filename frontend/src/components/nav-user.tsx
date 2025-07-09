@@ -85,7 +85,11 @@ export function NavUser() {
                     {user.email}
                   </span>
                   <span className="text-xs text-primary/70 font-medium mt-1">
-                    {user.role === "admin" ? "Administrator" : "User"}
+                    {user.role === "admin"
+                      ? "Administrator"
+                      : user.role === "manager"
+                      ? "Manager"
+                      : "User"}
                   </span>
                 </div>
               </div>

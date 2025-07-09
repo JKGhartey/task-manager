@@ -24,6 +24,7 @@ import SystemHealth from "../pages/Admin/SystemHealth";
 // User Pages
 import UserDashboard from "../pages/User/Dashboard";
 import VerifyEmail from "../pages/Auth/VerifyEmail";
+import ViewDepartments from "../pages/User/ViewDepartments";
 import ViewTaskDetails from "../pages/User/ViewTaskDetails";
 import { useAuth } from "../hooks/useAuth";
 
@@ -57,7 +58,7 @@ export function AppRoutes() {
         path="/dashboard"
         element={
           isAuthenticated ? (
-            userRole === "admin" ? (
+            userRole === "admin" || userRole === "manager" ? (
               <Navigate to={ROUTES.ADMIN.DASHBOARD} replace />
             ) : (
               <Navigate to={ROUTES.USER.DASHBOARD} replace />
@@ -68,11 +69,22 @@ export function AppRoutes() {
         }
       />
 
+      {/* Shared Routes - All authenticated users */}
+      <Route element={<PrivateRoute isAuthenticated={isAuthenticated} />}>
+        <Route
+          path={ROUTES.USER.VIEW_DEPARTMENTS}
+          element={<ViewDepartments />}
+        />
+      </Route>
+
       {/* Admin Routes */}
       <Route
         element={
           <PrivateRoute
-            isAuthenticated={isAuthenticated && userRole === "admin"}
+            isAuthenticated={
+              isAuthenticated &&
+              (userRole === "admin" || userRole === "manager")
+            }
           />
         }
       >

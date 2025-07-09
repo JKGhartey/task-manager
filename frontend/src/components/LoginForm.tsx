@@ -69,7 +69,8 @@ export function LoginForm({
 
         // Redirect based on user role
         const userRole = response.data.user.role;
-        if (userRole === "admin") {
+
+        if (userRole === "admin" || userRole === "manager") {
           navigate(ROUTES.ADMIN.DASHBOARD);
         } else {
           navigate(ROUTES.USER.DASHBOARD);

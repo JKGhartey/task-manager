@@ -89,7 +89,7 @@ export interface DepartmentStatsResponse {
   data: DepartmentStats;
 }
 
-// Get all departments with pagination and filtering
+// Get all departments with pagination and filtering (Admin only)
 export const getDepartments = async (
   page: number = 1,
   limit: number = 10,
@@ -105,6 +105,25 @@ export const getDepartments = async (
   if (status) params.append("status", status);
 
   const response = await api.get(`/departments?${params.toString()}`);
+  return response.data;
+};
+
+// Get all departments with pagination and filtering (All authenticated users)
+export const getPublicDepartments = async (
+  page: number = 1,
+  limit: number = 10,
+  search?: string,
+  status?: string
+): Promise<DepartmentResponse> => {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+
+  if (search) params.append("search", search);
+  if (status) params.append("status", status);
+
+  const response = await api.get(`/departments/public?${params.toString()}`);
   return response.data;
 };
 
@@ -148,11 +167,20 @@ export const getDepartmentStats =
     return response.data;
   };
 
-// Get active departments for dropdown
+// Get active departments for dropdown (Admin only)
 export const getActiveDepartments = async (): Promise<{
   success: boolean;
   data: { departments: Department[] };
 }> => {
   const response = await api.get("/departments/active");
+  return response.data;
+};
+
+// Get active departments for dropdown (All authenticated users)
+export const getPublicActiveDepartments = async (): Promise<{
+  success: boolean;
+  data: { departments: Department[] };
+}> => {
+  const response = await api.get("/departments/public/active");
   return response.data;
 };

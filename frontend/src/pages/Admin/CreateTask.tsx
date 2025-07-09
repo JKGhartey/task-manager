@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
 import {
   Select,
   SelectContent,
@@ -27,11 +27,18 @@ interface User {
   position?: string;
 }
 
+interface Department {
+  _id: string;
+  name: string;
+  description?: string;
+  status: string;
+}
+
 const CreateTask = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [formData, setFormData] = useState<CreateTaskData>({
     title: "",
     description: "",
@@ -47,6 +54,8 @@ const CreateTask = () => {
   });
   const [tagInput, setTagInput] = useState("");
 
+  const { isAuthenticated } = useAuth();
+
   // Fetch users for assignee selection
   useEffect(() => {
     const fetchUsers = async () => {
@@ -61,6 +70,23 @@ const CreateTask = () => {
 
     if (isAuthenticated) {
       fetchUsers();
+    }
+  }, [isAuthenticated]);
+
+  // Fetch departments for department selection
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await api.get("/departments/public/active");
+        setDepartments(response.data.data.departments);
+      } catch (error) {
+        console.error("Failed to fetch departments:", error);
+        toast.error("Failed to load departments");
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchDepartments();
     }
   }, [isAuthenticated]);
 
@@ -223,6 +249,27 @@ const CreateTask = () => {
               </div>
 
               <div>
+                <Label htmlFor="department">Department</Label>
+                <Select
+                  value={formData.department || undefined}
+                  onValueChange={(value) =>
+                    handleInputChange("department", value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {departments.map((dept) => (
+                      <SelectItem key={dept._id} value={dept._id}>
+                        {dept.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
                 <Label htmlFor="dueDate">Due Date</Label>
                 <Input
                   id="dueDate"
@@ -240,18 +287,6 @@ const CreateTask = () => {
                   value={formData.project}
                   onChange={(e) => handleInputChange("project", e.target.value)}
                   placeholder="Enter project name"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="department">Department</Label>
-                <Input
-                  id="department"
-                  value={formData.department}
-                  onChange={(e) =>
-                    handleInputChange("department", e.target.value)
-                  }
-                  placeholder="Enter department"
                 />
               </div>
 

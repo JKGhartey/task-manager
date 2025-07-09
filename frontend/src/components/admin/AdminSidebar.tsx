@@ -54,14 +54,19 @@ const adminData = {
       icon: IconUsers,
     },
     {
+      title: "View Departments",
+      url: ROUTES.USER.VIEW_DEPARTMENTS,
+      icon: IconBuilding,
+    },
+    {
+      title: "Manage Departments",
+      url: ROUTES.ADMIN.MANAGE_DEPARTMENTS,
+      icon: IconBuilding,
+    },
+    {
       title: "System Analytics",
       url: ROUTES.ADMIN.SYSTEM_ANALYTICS,
       icon: IconChartBar,
-    },
-    {
-      title: "Department Management",
-      url: ROUTES.ADMIN.MANAGE_DEPARTMENTS,
-      icon: IconBuilding,
     },
     {
       title: "System Health",

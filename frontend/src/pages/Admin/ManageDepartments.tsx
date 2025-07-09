@@ -1,3 +1,8 @@
+import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { IconPlus, IconSearch, IconBuilding } from "@tabler/icons-react";
+
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -5,10 +10,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type {
-  CreateDepartmentRequest,
-  UpdateDepartmentRequest,
-} from "@/utils/departmentService";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -17,39 +28,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { IconBuilding, IconPlus, IconSearch } from "@tabler/icons-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  createDepartment,
-  deleteDepartment,
-  getDepartments,
-  updateDepartment,
-} from "@/utils/departmentService";
-import { useEffect, useState } from "react";
-
-import { AdminLayout } from "@/components/layouts/AdminLayout";
-import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
-import type { Department } from "@/utils/departmentService";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import type { User } from "@/utils/userService";
 import { departmentColumns } from "./departmentColumns";
-import { toast } from "sonner";
-import { userService } from "@/utils/userService";
+import {
+  getDepartments,
+  createDepartment,
+  updateDepartment,
+  deleteDepartment,
+  type Department,
+  type CreateDepartmentRequest,
+  type UpdateDepartmentRequest,
+} from "@/utils/departmentService";
+import { userService, type User } from "@/utils/userService";
+import { AdminLayout } from "@/components/layouts/AdminLayout";
 
 export default function ManageDepartments() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -72,7 +69,7 @@ export default function ManageDepartments() {
     {
       name: "",
       description: "",
-      manager: "",
+      manager: "none",
       status: "active",
       code: "",
       location: "",
@@ -83,7 +80,7 @@ export default function ManageDepartments() {
   const [editFormData, setEditFormData] = useState<UpdateDepartmentRequest>({
     name: "",
     description: "",
-    manager: "",
+    manager: "none",
     status: "active",
     code: "",
     location: "",
@@ -97,7 +94,7 @@ export default function ManageDepartments() {
         pagination.page,
         pagination.limit,
         search,
-        statusFilter
+        statusFilter === "all" ? undefined : statusFilter
       );
       setDepartments(response.data.departments);
       setPagination(response.data.pagination);
@@ -146,7 +143,7 @@ export default function ManageDepartments() {
     setEditFormData({
       name: department.name,
       description: department.description || "",
-      manager: department.manager?._id || "",
+      manager: department.manager?._id || "none",
       status: department.status,
       code: department.code || "",
       location: department.location || "",
@@ -159,7 +156,7 @@ export default function ManageDepartments() {
     setCreateFormData({
       name: "",
       description: "",
-      manager: "",
+      manager: "none",
       status: "active",
       code: "",
       location: "",
@@ -171,7 +168,14 @@ export default function ManageDepartments() {
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createDepartment(createFormData);
+      const submitData = {
+        ...createFormData,
+        manager:
+          createFormData.manager === "none"
+            ? undefined
+            : createFormData.manager,
+      };
+      await createDepartment(submitData);
       toast.success("Department created successfully");
       setShowCreateModal(false);
       fetchDepartments();
@@ -188,7 +192,12 @@ export default function ManageDepartments() {
     if (!editingDepartment) return;
 
     try {
-      await updateDepartment(editingDepartment._id, editFormData);
+      const submitData = {
+        ...editFormData,
+        manager:
+          editFormData.manager === "none" ? undefined : editFormData.manager,
+      };
+      await updateDepartment(editingDepartment._id, submitData);
       toast.success("Department updated successfully");
       setShowEditModal(false);
       setEditingDepartment(null);
@@ -274,7 +283,7 @@ export default function ManageDepartments() {
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
                   <SelectItem value="archived">Archived</SelectItem>
@@ -361,7 +370,7 @@ export default function ManageDepartments() {
                       <SelectValue placeholder="Select a manager" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">No manager assigned</SelectItem>
+                      <SelectItem value="none">No manager assigned</SelectItem>
                       {managers.map((manager) => (
                         <SelectItem key={manager._id} value={manager._id}>
                           {manager.firstName} {manager.lastName} (
@@ -504,7 +513,7 @@ export default function ManageDepartments() {
                       <SelectValue placeholder="Select a manager" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">No manager assigned</SelectItem>
+                      <SelectItem value="none">No manager assigned</SelectItem>
                       {managers.map((manager) => (
                         <SelectItem key={manager._id} value={manager._id}>
                           {manager.firstName} {manager.lastName} (

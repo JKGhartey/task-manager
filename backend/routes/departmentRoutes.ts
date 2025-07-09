@@ -1,4 +1,8 @@
-import { authMiddleware, requireAdmin } from "../middlewares/authMiddleware";
+import {
+  authMiddleware,
+  requireAdmin,
+  requireAdminOrManager,
+} from "../middlewares/authMiddleware";
 import {
   createDepartment,
   deleteDepartment,
@@ -18,7 +22,7 @@ const router = express.Router();
  * @swagger
  * /api/departments:
  *   get:
- *     summary: Get all departments with filtering and pagination (Admin only)
+ *     summary: Get all departments with filtering and pagination (Admin/Manager only)
  *     tags: [Departments]
  *     security:
  *       - bearerAuth: []
@@ -68,17 +72,22 @@ const router = express.Router();
  *       401:
  *         description: Unauthorized
  *       403:
- *         description: Forbidden - admin access required
+ *         description: Forbidden - admin/manager access required
  *       500:
  *         description: Internal server error
  */
-router.get("/", authMiddleware, requireAdmin, asyncHandler(getAllDepartments));
+router.get(
+  "/",
+  authMiddleware,
+  requireAdminOrManager,
+  asyncHandler(getAllDepartments)
+);
 
 /**
  * @swagger
  * /api/departments/stats:
  *   get:
- *     summary: Get department statistics (Admin only)
+ *     summary: Get department statistics (Admin/Manager only)
  *     tags: [Departments]
  *     security:
  *       - bearerAuth: []
@@ -97,14 +106,14 @@ router.get("/", authMiddleware, requireAdmin, asyncHandler(getAllDepartments));
  *       401:
  *         description: Unauthorized
  *       403:
- *         description: Forbidden - admin access required
+ *         description: Forbidden - admin/manager access required
  *       500:
  *         description: Internal server error
  */
 router.get(
   "/stats",
   authMiddleware,
-  requireAdmin,
+  requireAdminOrManager,
   asyncHandler(getDepartmentStats)
 );
 
@@ -112,7 +121,7 @@ router.get(
  * @swagger
  * /api/departments/active:
  *   get:
- *     summary: Get active departments for dropdown (Admin only)
+ *     summary: Get active departments for dropdown (Admin/Manager only)
  *     tags: [Departments]
  *     security:
  *       - bearerAuth: []
@@ -136,14 +145,14 @@ router.get(
  *       401:
  *         description: Unauthorized
  *       403:
- *         description: Forbidden - admin access required
+ *         description: Forbidden - admin/manager access required
  *       500:
  *         description: Internal server error
  */
 router.get(
   "/active",
   authMiddleware,
-  requireAdmin,
+  requireAdminOrManager,
   asyncHandler(getActiveDepartments)
 );
 
@@ -193,7 +202,7 @@ router.get(
 router.get(
   "/:id",
   authMiddleware,
-  requireAdmin,
+  requireAdminOrManager,
   asyncHandler(getDepartmentById)
 );
 
@@ -238,7 +247,12 @@ router.get(
  *       500:
  *         description: Internal server error
  */
-router.post("/", authMiddleware, requireAdmin, asyncHandler(createDepartment));
+router.post(
+  "/",
+  authMiddleware,
+  requireAdminOrManager,
+  asyncHandler(createDepartment)
+);
 
 /**
  * @swagger
@@ -293,7 +307,7 @@ router.post("/", authMiddleware, requireAdmin, asyncHandler(createDepartment));
 router.put(
   "/:id",
   authMiddleware,
-  requireAdmin,
+  requireAdminOrManager,
   asyncHandler(updateDepartment)
 );
 
@@ -339,8 +353,103 @@ router.put(
 router.delete(
   "/:id",
   authMiddleware,
-  requireAdmin,
+  requireAdminOrManager,
   asyncHandler(deleteDepartment)
+);
+
+// Public view routes - accessible to all authenticated users
+/**
+ * @swagger
+ * /api/departments/public:
+ *   get:
+ *     summary: Get all departments with filtering and pagination (All authenticated users)
+ *     tags: [Departments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of items per page
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search in name, description, or code
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [active, inactive, archived]
+ *         description: Filter by department status
+ *     responses:
+ *       200:
+ *         description: Departments retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     departments:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Department'
+ *                     pagination:
+ *                       $ref: '#/components/schemas/PaginationResponse'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/public", authMiddleware, asyncHandler(getAllDepartments));
+
+/**
+ * @swagger
+ * /api/departments/public/active:
+ *   get:
+ *     summary: Get active departments for dropdown (All authenticated users)
+ *     tags: [Departments]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Active departments retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     departments:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Department'
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.get(
+  "/public/active",
+  authMiddleware,
+  asyncHandler(getActiveDepartments)
 );
 
 export default router;

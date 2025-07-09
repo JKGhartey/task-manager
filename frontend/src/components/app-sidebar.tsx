@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import {
+  IconBuilding,
   IconCamera,
   IconChartBar,
   IconDashboard,
@@ -46,6 +47,11 @@ const data = {
       title: "My Tasks",
       url: ROUTES.USER.MY_TASKS,
       icon: IconListDetails,
+    },
+    {
+      title: "Departments",
+      url: ROUTES.USER.VIEW_DEPARTMENTS,
+      icon: IconBuilding,
     },
     {
       title: "My Progress",
