@@ -172,7 +172,7 @@ export default function ManageUsers() {
   if (!isAuthenticated) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center h-64">
+        <div className="flex items-center justify-center h-64 p-6">
           <p className="text-muted-foreground">
             Please login to access user management.
           </p>
@@ -183,12 +183,14 @@ export default function ManageUsers() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="p-6 space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">User Management</h1>
-            <p className="text-muted-foreground">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">
+              User Management
+            </h1>
+            <p className="text-muted-foreground text-lg">
               Manage system users, roles, and permissions
             </p>
           </div>
@@ -197,7 +199,7 @@ export default function ManageUsers() {
             onOpenChange={setIsCreateDialogOpen}
           >
             <DialogTrigger asChild>
-              <Button>
+              <Button className="w-full sm:w-auto">
                 <IconPlus className="w-4 h-4 mr-2" />
                 Create User
               </Button>
@@ -210,8 +212,8 @@ export default function ManageUsers() {
                   initial status.
                 </DialogDescription>
               </DialogHeader>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
                   <Label htmlFor="firstName">First Name</Label>
                   <Input
                     id="firstName"
@@ -222,9 +224,10 @@ export default function ManageUsers() {
                         firstName: e.target.value,
                       })
                     }
+                    placeholder="Enter first name"
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="lastName">Last Name</Label>
                   <Input
                     id="lastName"
@@ -235,9 +238,10 @@ export default function ManageUsers() {
                         lastName: e.target.value,
                       })
                     }
+                    placeholder="Enter last name"
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
@@ -249,9 +253,10 @@ export default function ManageUsers() {
                         email: e.target.value,
                       })
                     }
+                    placeholder="Enter email address"
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
@@ -263,9 +268,10 @@ export default function ManageUsers() {
                         password: e.target.value,
                       })
                     }
+                    placeholder="Enter password"
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
                   <Select
                     value={createUserData.role}
@@ -274,7 +280,7 @@ export default function ManageUsers() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="user">User</SelectItem>
@@ -283,7 +289,7 @@ export default function ManageUsers() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="status">Status</Label>
                   <Select
                     value={createUserData.status}
@@ -294,7 +300,7 @@ export default function ManageUsers() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="active">Active</SelectItem>
@@ -303,7 +309,7 @@ export default function ManageUsers() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="department">Department</Label>
                   <Input
                     id="department"
@@ -314,9 +320,10 @@ export default function ManageUsers() {
                         department: e.target.value,
                       })
                     }
+                    placeholder="Enter department"
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="position">Position</Label>
                   <Input
                     id="position"
@@ -327,9 +334,10 @@ export default function ManageUsers() {
                         position: e.target.value,
                       })
                     }
+                    placeholder="Enter position"
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="phone">Phone</Label>
                   <Input
                     id="phone"
@@ -340,9 +348,10 @@ export default function ManageUsers() {
                         phone: e.target.value,
                       })
                     }
+                    placeholder="Enter phone number"
                   />
                 </div>
-                <div>
+                <div className="space-y-2">
                   <Label htmlFor="hireDate">Hire Date</Label>
                   <Input
                     id="hireDate"
@@ -357,7 +366,7 @@ export default function ManageUsers() {
                   />
                 </div>
               </div>
-              <DialogFooter>
+              <DialogFooter className="gap-2">
                 <Button
                   variant="outline"
                   onClick={() => setIsCreateDialogOpen(false)}
@@ -371,32 +380,39 @@ export default function ManageUsers() {
         </div>
 
         {/* Filters */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Filters</CardTitle>
+        <Card className="border-0 shadow-sm bg-gradient-to-r from-gray-50 to-white">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl">Filters & Search</CardTitle>
+            <CardDescription>
+              Filter users by role, status, or search by name and email
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Label htmlFor="search">Search</Label>
-                <div className="relative">
-                  <IconSearch className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="md:col-span-2">
+                <Label htmlFor="search" className="text-sm font-medium">
+                  Search
+                </Label>
+                <div className="relative mt-1">
+                  <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="search"
                     placeholder="Search by name or email..."
                     value={filters.search || ""}
                     onChange={(e) => handleSearchChange(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-10"
                   />
                 </div>
               </div>
               <div>
-                <Label htmlFor="role-filter">Role</Label>
+                <Label htmlFor="role-filter" className="text-sm font-medium">
+                  Role
+                </Label>
                 <Select
                   value={filters.role || "all"}
                   onValueChange={handleRoleFilterChange}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="mt-1 h-10">
                     <SelectValue placeholder="All roles" />
                   </SelectTrigger>
                   <SelectContent>
@@ -408,12 +424,14 @@ export default function ManageUsers() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="status-filter">Status</Label>
+                <Label htmlFor="status-filter" className="text-sm font-medium">
+                  Status
+                </Label>
                 <Select
                   value={filters.status || "all"}
                   onValueChange={handleStatusFilterChange}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="mt-1 h-10">
                     <SelectValue placeholder="All statuses" />
                   </SelectTrigger>
                   <SelectContent>
@@ -424,189 +442,272 @@ export default function ManageUsers() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex items-end">
-                <Button variant="outline" onClick={refreshUsers}>
-                  <IconRefresh className="w-4 h-4" />
-                </Button>
-              </div>
+            </div>
+            <div className="flex justify-end mt-4">
+              <Button
+                variant="outline"
+                onClick={refreshUsers}
+                className="gap-2"
+              >
+                <IconRefresh className="w-4 h-4" />
+                Refresh
+              </Button>
             </div>
           </CardContent>
         </Card>
 
         {/* Users Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Users ({filteredUsers.length})</CardTitle>
-            <CardDescription>
-              Manage user accounts, roles, and status
-            </CardDescription>
+        <Card className="border-0 shadow-sm">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl">Users</CardTitle>
+                <CardDescription>
+                  {filteredUsers.length} user
+                  {filteredUsers.length !== 1 ? "s" : ""} found
+                </CardDescription>
+              </div>
+              <Badge variant="secondary" className="text-sm">
+                Total: {users.length}
+              </Badge>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div className="flex items-center justify-center py-16">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <p className="text-muted-foreground">Loading users...</p>
+                </div>
               </div>
             ) : error ? (
-              <div className="flex items-center justify-center py-8">
-                <p className="text-destructive">{error}</p>
+              <div className="flex items-center justify-center py-16">
+                <div className="text-center space-y-2">
+                  <p className="text-destructive font-medium">{error}</p>
+                  <Button variant="outline" onClick={refreshUsers} size="sm">
+                    Try Again
+                  </Button>
+                </div>
+              </div>
+            ) : filteredUsers.length === 0 ? (
+              <div className="flex items-center justify-center py-16 px-4">
+                <div className="text-center space-y-4">
+                  <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center">
+                    <IconUsers className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium">No users found</h3>
+                    <p className="text-muted-foreground">
+                      {filters.search || filters.role || filters.status
+                        ? "Try adjusting your filters or search terms."
+                        : "Get started by creating your first user."}
+                    </p>
+                  </div>
+                </div>
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Last Login</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredUsers.map((user) => (
-                    <TableRow key={user._id}>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">
-                            {user.firstName} {user.lastName}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {user.position}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div>{user.email}</div>
-                          {user.isEmailVerified && (
-                            <Badge variant="outline" className="text-xs">
-                              Verified
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className="flex items-center gap-1 w-fit"
-                        >
-                          {getRoleIcon(user.role)}
-                          {user.role}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={`${getStatusColor(user.status)}`}
-                        >
-                          {user.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{user.department || "-"}</TableCell>
-                      <TableCell>
-                        {user.lastLogin
-                          ? new Date(user.lastLogin).toLocaleDateString()
-                          : "Never"}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <IconEdit className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>
-                              <IconEye className="w-4 h-4 mr-2" />
-                              View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <IconEdit className="w-4 h-4 mr-2" />
-                              Edit User
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuLabel>Change Role</DropdownMenuLabel>
-                            <DropdownMenuItem
-                              onClick={() => updateUserRole(user._id, "user")}
-                            >
-                              Set as User
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                updateUserRole(user._id, "manager")
-                              }
-                            >
-                              Set as Manager
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => updateUserRole(user._id, "admin")}
-                            >
-                              Set as Admin
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuLabel>Change Status</DropdownMenuLabel>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                updateUserStatus(user._id, "active")
-                              }
-                            >
-                              Activate
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                updateUserStatus(user._id, "inactive")
-                              }
-                            >
-                              Deactivate
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                updateUserStatus(user._id, "suspended")
-                              }
-                            >
-                              Suspend
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+              <div className="overflow-hidden rounded-lg border mx-4 my-4">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50">
+                      <TableHead className="font-semibold">Name</TableHead>
+                      <TableHead className="font-semibold">Email</TableHead>
+                      <TableHead className="font-semibold">Role</TableHead>
+                      <TableHead className="font-semibold">Status</TableHead>
+                      <TableHead className="font-semibold">
+                        Department
+                      </TableHead>
+                      <TableHead className="font-semibold">
+                        Last Login
+                      </TableHead>
+                      <TableHead className="font-semibold text-right">
+                        Actions
+                      </TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredUsers.map((user, index) => (
+                      <TableRow
+                        key={user._id}
+                        className={index % 2 === 0 ? "bg-white" : "bg-muted/30"}
+                      >
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="font-medium">
+                              {user.firstName} {user.lastName}
+                            </div>
+                            {user.position && (
+                              <div className="text-sm text-muted-foreground">
+                                {user.position}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="space-y-1">
+                            <div className="font-medium">{user.email}</div>
+                            {user.isEmailVerified && (
+                              <Badge variant="outline" className="text-xs">
+                                Verified
+                              </Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className="flex items-center gap-1 w-fit font-medium"
+                          >
+                            {getRoleIcon(user.role)}
+                            <span className="capitalize">{user.role}</span>
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className={`${getStatusColor(
+                              user.status
+                            )} font-medium capitalize`}
+                          >
+                            {user.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-muted-foreground">
+                            {user.department || "—"}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm text-muted-foreground">
+                            {user.lastLogin
+                              ? new Date(user.lastLogin).toLocaleDateString()
+                              : "Never"}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                              >
+                                <IconEdit className="w-4 h-4" />
+                                <span className="sr-only">Open menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem>
+                                <IconEye className="w-4 h-4 mr-2" />
+                                View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <IconEdit className="w-4 h-4 mr-2" />
+                                Edit User
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuLabel>Change Role</DropdownMenuLabel>
+                              <DropdownMenuItem
+                                onClick={() => updateUserRole(user._id, "user")}
+                              >
+                                Set as User
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  updateUserRole(user._id, "manager")
+                                }
+                              >
+                                Set as Manager
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  updateUserRole(user._id, "admin")
+                                }
+                              >
+                                Set as Admin
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuLabel>
+                                Change Status
+                              </DropdownMenuLabel>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  updateUserStatus(user._id, "active")
+                                }
+                              >
+                                Activate
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  updateUserStatus(user._id, "inactive")
+                                }
+                              >
+                                Deactivate
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  updateUserStatus(user._id, "suspended")
+                                }
+                              >
+                                Suspend
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between space-x-2 py-4">
-            <div className="flex-1 text-sm text-muted-foreground">
-              Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
-              {Math.min(pagination.page * pagination.limit, pagination.total)}{" "}
-              of {pagination.total} results.
-            </div>
-            <div className="space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => changePage(pagination.page - 1)}
-                disabled={!pagination.hasPrev}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => changePage(pagination.page + 1)}
-                disabled={!pagination.hasNext}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
+          <Card className="border-0 shadow-sm">
+            <CardContent className="py-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="text-sm text-muted-foreground">
+                  Showing{" "}
+                  <span className="font-medium">
+                    {(pagination.page - 1) * pagination.limit + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-medium">
+                    {Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.total
+                    )}
+                  </span>{" "}
+                  of <span className="font-medium">{pagination.total}</span>{" "}
+                  results.
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => changePage(pagination.page - 1)}
+                    disabled={!pagination.hasPrev}
+                    className="gap-2"
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => changePage(pagination.page + 1)}
+                    disabled={!pagination.hasNext}
+                    className="gap-2"
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </AdminLayout>

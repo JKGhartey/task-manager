@@ -15,6 +15,8 @@ export const ROUTES = {
     MANAGE_TASKS: "/admin/manage-tasks",
     MANAGE_USERS: "/admin/manage-users",
     EDIT_TASK: "/admin/edit-task/:id",
+    SYSTEM_HEALTH: "/admin/system-health",
+    SYSTEM_ANALYTICS: "/admin/system-analytics",
   },
 
   // User routes
@@ -38,6 +40,8 @@ export const NAVIGATION_ROUTES = {
     { path: ROUTES.ADMIN.CREATE_TASK, label: "Create Task" },
     { path: ROUTES.ADMIN.MANAGE_TASKS, label: "Manage Tasks" },
     { path: ROUTES.ADMIN.MANAGE_USERS, label: "Manage Users" },
+    { path: ROUTES.ADMIN.SYSTEM_HEALTH, label: "System Health" },
+    { path: ROUTES.ADMIN.SYSTEM_ANALYTICS, label: "System Analytics" },
   ],
   user: [
     { path: ROUTES.USER.DASHBOARD, label: "Dashboard" },

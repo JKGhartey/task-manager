@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -11,9 +16,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { taskService, type Task, type TaskFilters } from "@/utils/taskService";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminLayout } from "@/components/layouts/AdminLayout";
+import { IconSearch, IconPlus, IconUsers } from "@tabler/icons-react";
+import AdminTaskRow from "@/components/admin/AdminTaskRow";
 
 const ManageTasks = () => {
   const { isAuthenticated } = useAuth();
@@ -37,7 +51,6 @@ const ManageTasks = () => {
       setLoading(false);
       return;
     }
-
     try {
       setLoading(true);
       const response = await taskService.getAllTasks(filters);
@@ -53,28 +66,17 @@ const ManageTasks = () => {
 
   useEffect(() => {
     fetchTasks();
+    // eslint-disable-next-line
   }, [isAuthenticated, filters]);
-
-  const handleStatusUpdate = async (taskId: string, newStatus: string) => {
-    try {
-      await taskService.updateTaskStatus(taskId, newStatus);
-      toast.success("Task status updated successfully");
-      fetchTasks(); // Refresh the list
-    } catch (error) {
-      console.error("Failed to update task status:", error);
-      toast.error("Failed to update task status");
-    }
-  };
 
   const handleDeleteTask = async (taskId: string) => {
     if (!confirm("Are you sure you want to delete this task?")) {
       return;
     }
-
     try {
       await taskService.deleteTask(taskId);
       toast.success("Task deleted successfully");
-      fetchTasks(); // Refresh the list
+      fetchTasks();
     } catch (error) {
       console.error("Failed to delete task:", error);
       toast.error("Failed to delete task");
@@ -88,7 +90,7 @@ const ManageTasks = () => {
     setFilters((prev) => ({
       ...prev,
       [key]: value,
-      page: 1, // Reset to first page when filters change
+      page: 1,
     }));
   };
 
@@ -96,74 +98,15 @@ const ManageTasks = () => {
     setFilters((prev) => ({ ...prev, page }));
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "in_progress":
-        return "bg-blue-100 text-blue-800";
-      case "review":
-        return "bg-purple-100 text-purple-800";
-      case "testing":
-        return "bg-orange-100 text-orange-800";
-      case "done":
-        return "bg-green-100 text-green-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "low":
-        return "bg-gray-100 text-gray-800";
-      case "medium":
-        return "bg-blue-100 text-blue-800";
-      case "high":
-        return "bg-orange-100 text-orange-800";
-      case "urgent":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+  const clearFilters = () => {
+    setFilters({ page: 1, limit: 10 });
   };
 
   if (!isAuthenticated) {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-64">
-          <p className="text-gray-500">Please log in to manage tasks</p>
-        </div>
-      </AdminLayout>
-    );
-  }
-
-  if (loading) {
-    return (
-      <AdminLayout>
-        <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardContent className="p-6">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
-                <div className="flex gap-2">
-                  <div className="h-6 bg-gray-200 rounded w-16"></div>
-                  <div className="h-6 bg-gray-200 rounded w-20"></div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          <p className="text-muted-foreground">Please log in to manage tasks</p>
         </div>
       </AdminLayout>
     );
@@ -171,51 +114,56 @@ const ManageTasks = () => {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Manage Tasks</h1>
-            <p className="text-gray-600">
-              View and manage all tasks in the system
-            </p>
+      <div className="space-y-6 p-4 md:p-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-2 border-b">
+          <div className="flex items-center gap-3">
+            <IconUsers className="w-8 h-8 text-primary" />
+            <div>
+              <h1 className="text-3xl font-bold">Manage Tasks</h1>
+              <p className="text-muted-foreground text-sm">
+                View and manage all tasks in the system
+              </p>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => (window.location.href = "/admin/create-task")}
-            >
-              Create New Task
-            </Button>
-          </div>
+          <Button onClick={() => (window.location.href = "/admin/create-task")}>
+            <IconPlus className="w-4 h-4 mr-2" /> Create New Task
+          </Button>
         </div>
 
         {/* Filters */}
-        <Card>
-          <CardHeader>
+        <Card className="bg-muted/50">
+          <CardHeader className="pb-2">
             <CardTitle className="text-lg">Filters</CardTitle>
+            <CardDescription>
+              Refine your search and filter tasks
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Search
-                </label>
-                <Input
-                  placeholder="Search tasks..."
-                  value={filters.search || ""}
-                  onChange={(e) => handleFilterChange("search", e.target.value)}
-                />
+            <div className="flex flex-col md:flex-row gap-4 items-end">
+              <div className="flex-1">
+                <label className="block text-sm font-medium mb-1">Search</label>
+                <div className="relative">
+                  <IconSearch className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search tasks..."
+                    value={filters.search || ""}
+                    onChange={(e) =>
+                      handleFilterChange("search", e.target.value)
+                    }
+                    className="pl-10"
+                  />
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status
-                </label>
+                <label className="block text-sm font-medium mb-1">Status</label>
                 <Select
                   value={filters.status || "all"}
                   onValueChange={(value) =>
                     handleFilterChange("status", value === "all" ? "" : value)
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-36">
                     <SelectValue placeholder="All statuses" />
                   </SelectTrigger>
                   <SelectContent>
@@ -230,7 +178,7 @@ const ManageTasks = () => {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1">
                   Priority
                 </label>
                 <Select
@@ -239,7 +187,7 @@ const ManageTasks = () => {
                     handleFilterChange("priority", value === "all" ? "" : value)
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-32">
                     <SelectValue placeholder="All priorities" />
                   </SelectTrigger>
                   <SelectContent>
@@ -252,42 +200,7 @@ const ManageTasks = () => {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Type
-                </label>
-                <Select
-                  value={filters.type || "all"}
-                  onValueChange={(value) =>
-                    handleFilterChange("type", value === "all" ? "" : value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="All types" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All types</SelectItem>
-                    <SelectItem value="feature">Feature</SelectItem>
-                    <SelectItem value="bug">Bug</SelectItem>
-                    <SelectItem value="improvement">Improvement</SelectItem>
-                    <SelectItem value="documentation">Documentation</SelectItem>
-                    <SelectItem value="maintenance">Maintenance</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Project
-                </label>
-                <Input
-                  placeholder="Filter by project..."
-                  value={filters.project || ""}
-                  onChange={(e) =>
-                    handleFilterChange("project", e.target.value)
-                  }
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1">
                   Items per page
                 </label>
                 <Select
@@ -296,7 +209,7 @@ const ManageTasks = () => {
                     handleFilterChange("limit", parseInt(value))
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-28">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -307,181 +220,93 @@ const ManageTasks = () => {
                   </SelectContent>
                 </Select>
               </div>
+              <Button variant="outline" onClick={clearFilters} className="h-10">
+                Clear
+              </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Tasks List */}
-        {tasks.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <p className="text-gray-500">No tasks found</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {tasks.map((task) => (
-              <Card
-                key={task._id}
-                className="hover:shadow-md transition-shadow"
-              >
-                <CardContent className="p-6">
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {task.title}
-                        </h3>
-                        <div className="flex gap-2 ml-4">
-                          <Badge className={getStatusColor(task.status)}>
-                            {task.status.replace("_", " ")}
-                          </Badge>
-                          <Badge className={getPriorityColor(task.priority)}>
-                            {task.priority}
-                          </Badge>
-                          <Badge variant="outline">{task.type}</Badge>
-                        </div>
-                      </div>
-
-                      <p className="text-gray-600 mb-3 line-clamp-2">
-                        {task.description}
-                      </p>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-500">
-                        <div>
-                          <span className="font-medium">Assignee:</span>{" "}
-                          {task.assignee.firstName} {task.assignee.lastName}
-                        </div>
-                        <div>
-                          <span className="font-medium">Created by:</span>{" "}
-                          {task.createdBy.firstName} {task.createdBy.lastName}
-                        </div>
-                        {task.project && (
-                          <div>
-                            <span className="font-medium">Project:</span>{" "}
-                            {task.project}
-                          </div>
-                        )}
-                        {task.department && (
-                          <div>
-                            <span className="font-medium">Department:</span>{" "}
-                            {task.department}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-500 mt-2">
-                        {task.dueDate && (
-                          <span>Due: {formatDate(task.dueDate)}</span>
-                        )}
-                        {task.estimatedHours && (
-                          <span>Est. Hours: {task.estimatedHours}</span>
-                        )}
-                        <span>Created: {formatDate(task.createdAt)}</span>
-                      </div>
-
-                      {task.tags.length > 0 && (
-                        <div className="flex gap-1 mt-3">
-                          {task.tags.map((tag, index) => (
-                            <Badge
-                              key={index}
-                              variant="outline"
-                              className="text-xs"
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col gap-2 min-w-[200px]">
-                      <Select
-                        value={task.status}
-                        onValueChange={(value) =>
-                          handleStatusUpdate(task._id, value)
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="in_progress">
-                            In Progress
-                          </SelectItem>
-                          <SelectItem value="review">Review</SelectItem>
-                          <SelectItem value="testing">Testing</SelectItem>
-                          <SelectItem value="done">Done</SelectItem>
-                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                        </SelectContent>
-                      </Select>
-
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            (window.location.href = `/tasks/${task._id}`)
-                          }
-                        >
-                          View Details
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            (window.location.href = `/admin/edit-task/${task._id}`)
-                          }
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteTask(task._id)}
-                        >
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+        {/* Tasks Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Tasks</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            {loading ? (
+              <div className="p-8">
+                <div className="animate-pulse space-y-4">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="h-6 bg-muted rounded w-full" />
+                  ))}
+                </div>
+              </div>
+            ) : tasks.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-12 text-center text-muted-foreground">
+                <IconUsers className="w-12 h-12 mb-2 text-muted-foreground" />
+                <p className="text-lg font-semibold">No tasks found</p>
+                <p className="text-sm">
+                  Try adjusting your filters or create a new task.
+                </p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Priority</TableHead>
+                    <TableHead>Assignee</TableHead>
+                    <TableHead>Created By</TableHead>
+                    <TableHead>Due</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {tasks.map((task) => (
+                    <AdminTaskRow
+                      key={task._id}
+                      task={task}
+                      onView={(id) => (window.location.href = `/tasks/${id}`)}
+                      onEdit={(id) =>
+                        (window.location.href = `/admin/edit-task/${id}`)
+                      }
+                      onDelete={handleDeleteTask}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-500">
-                  Page {pagination.page} of {pagination.totalPages} • Total:{" "}
-                  {pagination.total} tasks
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!pagination.hasPrev}
-                    onClick={() => handlePageChange(pagination.page - 1)}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={!pagination.hasNext}
-                    onClick={() => handlePageChange(pagination.page + 1)}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="flex items-center justify-between space-x-2 py-4">
+            <div className="flex-1 text-sm text-muted-foreground">
+              Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+              {Math.min(pagination.page * pagination.limit, pagination.total)}{" "}
+              of {pagination.total} results.
+            </div>
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={!pagination.hasPrev}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={!pagination.hasNext}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
         )}
       </div>
     </AdminLayout>

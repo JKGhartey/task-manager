@@ -55,7 +55,7 @@ const adminData = {
     },
     {
       title: "System Analytics",
-      url: "#",
+      url: ROUTES.ADMIN.SYSTEM_ANALYTICS,
       icon: IconChartBar,
     },
     {
@@ -65,7 +65,7 @@ const adminData = {
     },
     {
       title: "System Health",
-      url: "#",
+      url: ROUTES.ADMIN.SYSTEM_HEALTH,
       icon: IconActivity,
     },
   ],

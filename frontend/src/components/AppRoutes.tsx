@@ -17,6 +17,8 @@ import PrivateRoute from "../routes/PrivateRoute";
 import { ROUTES } from "../routes/routes";
 import ResetPassword from "../pages/Auth/ResetPassword";
 import Signup from "../pages/Auth/Signup";
+import SystemAnalytics from "../pages/Admin/SystemAnalytics";
+import SystemHealth from "../pages/Admin/SystemHealth";
 // User Pages
 import UserDashboard from "../pages/User/Dashboard";
 import VerifyEmail from "../pages/Auth/VerifyEmail";
@@ -75,6 +77,11 @@ export function AppRoutes() {
         <Route path={ROUTES.ADMIN.CREATE_TASK} element={<CreateTask />} />
         <Route path={ROUTES.ADMIN.MANAGE_TASKS} element={<ManageTasks />} />
         <Route path={ROUTES.ADMIN.MANAGE_USERS} element={<ManageUsers />} />
+        <Route path={ROUTES.ADMIN.SYSTEM_HEALTH} element={<SystemHealth />} />
+        <Route
+          path={ROUTES.ADMIN.SYSTEM_ANALYTICS}
+          element={<SystemAnalytics />}
+        />
         <Route path="/admin/edit-task/:id" element={<EditTask />} />
       </Route>
 
