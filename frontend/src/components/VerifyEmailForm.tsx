@@ -10,7 +10,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail } from "lucide-react";
 import { ROUTES } from "@/routes/routes";
 import type React from "react";
 import { authService } from "@/utils/authService";
@@ -104,8 +103,12 @@ export function VerifyEmailForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-accent/20">
-            <Mail className="h-6 w-6 brand-secondary" />
+          <div className="flex justify-center mb-4">
+            <img
+              src="/logo.jpg"
+              alt="TaskManager Logo"
+              className="h-12 w-12 rounded-lg object-cover"
+            />
           </div>
           <CardTitle className="text-2xl brand-primary">
             Verify your email

@@ -95,6 +95,13 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <img
+              src="/logo.jpg"
+              alt="TaskManager Logo"
+              className="h-12 w-12 rounded-lg object-cover"
+            />
+          </div>
           <CardTitle className="text-2xl brand-primary">Welcome Back</CardTitle>
           <CardDescription>
             Enter your email below to login to your account

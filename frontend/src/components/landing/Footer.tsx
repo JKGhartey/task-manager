@@ -39,6 +39,18 @@ const socialLinks = [
 ];
 
 export function Footer() {
+  const handleSmoothScroll = (href: string) => {
+    if (href.startsWith("#")) {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }
+  };
+
   return (
     <footer className="bg-muted/50 border-t">
       <div className="container mx-auto px-4 py-12">
@@ -46,7 +58,14 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <div className="mb-4">
-              <h3 className="text-xl font-bold">TaskManager</h3>
+              <div className="flex items-center gap-2 mb-2">
+                <img
+                  src="/logo.jpg"
+                  alt="TaskManager Logo"
+                  className="h-8 w-8 rounded-lg object-cover"
+                />
+                <h3 className="text-xl font-bold">TaskManager</h3>
+              </div>
               <p className="text-sm text-muted-foreground mt-2">
                 Streamline your workflow and boost productivity with our
                 intuitive task management platform.
@@ -75,12 +94,21 @@ export function Footer() {
             <ul className="space-y-2">
               {footerLinks.product.map((link) => (
                 <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.name}
-                  </a>
+                  {link.href.startsWith("#") ? (
+                    <button
+                      onClick={() => handleSmoothScroll(link.href)}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors text-left"
+                    >
+                      {link.name}
+                    </button>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.name}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -92,12 +120,21 @@ export function Footer() {
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.name}
-                  </a>
+                  {link.href.startsWith("#") ? (
+                    <button
+                      onClick={() => handleSmoothScroll(link.href)}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors text-left"
+                    >
+                      {link.name}
+                    </button>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.name}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -142,7 +179,7 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-muted-foreground">
-              © 2024 TaskManager. All rights reserved.
+              © {new Date().getFullYear()} TaskManager. All rights reserved.
             </p>
             <div className="flex gap-4">
               <Button asChild variant="outline" size="sm">

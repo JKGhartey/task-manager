@@ -103,7 +103,14 @@ export function ChangePasswordForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
-        <CardHeader>
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <img
+              src="/logo.jpg"
+              alt="TaskManager Logo"
+              className="h-12 w-12 rounded-lg object-cover"
+            />
+          </div>
           <CardTitle className="text-2xl">Change your password</CardTitle>
           <CardDescription>
             Enter your current password and new password below

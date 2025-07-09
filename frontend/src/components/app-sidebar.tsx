@@ -12,7 +12,6 @@ import {
   IconFileWord,
   IconFolder,
   IconHelp,
-  IconInnerShadowTop,
   IconListDetails,
   IconReport,
   IconSearch,
@@ -163,9 +162,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-3 hover:bg-accent/50 transition-colors duration-200"
             >
               <a href="#" className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-sm">
-                  <IconInnerShadowTop className="!size-4" />
-                </div>
+                <img
+                  src="/logo.jpg"
+                  alt="TaskManager Logo"
+                  className="h-8 w-8 rounded-lg object-cover shadow-sm"
+                />
                 <div className="flex flex-col items-start">
                   <span className="text-base font-semibold tracking-tight">
                     Task Manager

@@ -103,7 +103,14 @@ export function ResetPasswordForm({
     return (
       <div className={cn("flex flex-col gap-6", className)} {...props}>
         <Card>
-          <CardHeader>
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <img
+                src="/logo.jpg"
+                alt="TaskManager Logo"
+                className="h-12 w-12 rounded-lg object-cover"
+              />
+            </div>
             <CardTitle className="text-2xl">Invalid Reset Link</CardTitle>
             <CardDescription>
               The password reset link is invalid or has expired.
@@ -125,7 +132,14 @@ export function ResetPasswordForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
-        <CardHeader>
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <img
+              src="/logo.jpg"
+              alt="TaskManager Logo"
+              className="h-12 w-12 rounded-lg object-cover"
+            />
+          </div>
           <CardTitle className="text-2xl">Reset your password</CardTitle>
           <CardDescription>Enter your new password below</CardDescription>
         </CardHeader>

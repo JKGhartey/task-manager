@@ -15,6 +15,18 @@ const navigation = [
 export function LandingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const handleSmoothScroll = (href: string) => {
+    if (href.startsWith("#")) {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
@@ -22,11 +34,11 @@ export function LandingHeader() {
           {/* Logo */}
           <div className="flex items-center">
             <Link to={ROUTES.LANDING} className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">
-                  TM
-                </span>
-              </div>
+              <img
+                src="/logo.jpg"
+                alt="TaskManager Logo"
+                className="h-8 w-8 rounded-lg object-cover"
+              />
               <span className="font-bold text-xl">TaskManager</span>
             </Link>
           </div>
@@ -34,13 +46,13 @@ export function LandingHeader() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => (
-              <a
+              <button
                 key={item.name}
-                href={item.href}
+                onClick={() => handleSmoothScroll(item.href)}
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 {item.name}
-              </a>
+              </button>
             ))}
           </nav>
 
@@ -75,14 +87,16 @@ export function LandingHeader() {
           <div className="md:hidden py-4 border-t">
             <nav className="flex flex-col space-y-4">
               {navigation.map((item) => (
-                <a
+                <button
                   key={item.name}
-                  href={item.href}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => {
+                    handleSmoothScroll(item.href);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors text-left"
                 >
                   {item.name}
-                </a>
+                </button>
               ))}
               <div className="flex flex-col space-y-2 pt-4 border-t">
                 <Button asChild variant="ghost" className="justify-start">

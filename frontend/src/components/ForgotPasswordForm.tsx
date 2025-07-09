@@ -86,7 +86,14 @@ export function ForgotPasswordForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
-        <CardHeader>
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <img
+              src="/logo.jpg"
+              alt="TaskManager Logo"
+              className="h-12 w-12 rounded-lg object-cover"
+            />
+          </div>
           <CardTitle className="text-2xl">Reset your password</CardTitle>
           <CardDescription>
             Enter your email address and we'll send you a link to reset your
