@@ -1,18 +1,14 @@
-import { IconEdit, IconTrash } from "@tabler/icons-react";
+import { IconEdit, IconEye, IconTrash } from "@tabler/icons-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { Department } from "@/utils/departmentService";
 
-interface DepartmentColumnsProps {
-  onEdit: (department: Department) => void;
-  onDelete: (id: string) => void;
-}
-
 export const departmentColumns = (
   onEdit: (department: Department) => void,
-  onDelete: (id: string) => void
+  onDelete: (id: string) => void,
+  onView?: (department: Department) => void
 ): ColumnDef<Department>[] => [
   {
     accessorKey: "name",
@@ -102,6 +98,16 @@ export const departmentColumns = (
 
       return (
         <div className="flex items-center gap-2">
+          {onView && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onView(department)}
+              className="h-8 w-8 p-0"
+            >
+              <IconEye className="h-4 w-4" />
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
