@@ -687,26 +687,40 @@ export const getTaskStats = async (req: Request, res: Response) => {
     const userId = (req as any).user.userId;
     const userRole = (req as any).user.role;
 
+    console.log("Getting task stats...");
+    console.log("User ID:", userId);
+    console.log("User role:", userRole);
+
     let query: any = {};
 
-    // If not admin, only show stats for user's tasks
-    if (userRole !== "admin") {
+    // If not admin or manager, only show stats for user's tasks
+    if (userRole !== "admin" && userRole !== "manager") {
       query.$or = [{ assignee: userId }, { createdBy: userId }];
+      console.log("Regular user query:", query);
+    } else {
+      console.log("Admin/Manager query - showing all tasks");
     }
 
     const totalTasks = await Task.countDocuments(query);
+    console.log("Total tasks:", totalTasks);
+
     const pendingTasks = await Task.countDocuments({
       ...query,
       status: TaskStatus.Pending,
     });
+    console.log("Pending tasks:", pendingTasks);
+
     const inProgressTasks = await Task.countDocuments({
       ...query,
       status: TaskStatus.InProgress,
     });
+    console.log("In progress tasks:", inProgressTasks);
+
     const completedTasks = await Task.countDocuments({
       ...query,
       status: TaskStatus.Done,
     });
+    console.log("Completed tasks:", completedTasks);
 
     // Get tasks by priority
     const priorityStats = await Task.aggregate([
@@ -714,6 +728,7 @@ export const getTaskStats = async (req: Request, res: Response) => {
       { $group: { _id: "$priority", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
     ]);
+    console.log("Priority stats:", priorityStats);
 
     // Get tasks by type
     const typeStats = await Task.aggregate([
@@ -721,6 +736,7 @@ export const getTaskStats = async (req: Request, res: Response) => {
       { $group: { _id: "$type", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
     ]);
+    console.log("Type stats:", typeStats);
 
     // Get tasks by project
     const projectStats = await Task.aggregate([
@@ -729,6 +745,7 @@ export const getTaskStats = async (req: Request, res: Response) => {
       { $sort: { count: -1 } },
       { $limit: 10 },
     ]);
+    console.log("Project stats:", projectStats);
 
     // Get overdue tasks
     const overdueTasks = await Task.countDocuments({
@@ -736,6 +753,7 @@ export const getTaskStats = async (req: Request, res: Response) => {
       dueDate: { $lt: new Date() },
       status: { $nin: [TaskStatus.Done, TaskStatus.Cancelled] },
     });
+    console.log("Overdue tasks:", overdueTasks);
 
     res.json({
       success: true,

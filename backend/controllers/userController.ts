@@ -443,39 +443,57 @@ export const updateUserRole = async (
   }
 };
 
-// @desc    Get user statistics (Admin only)
+// @desc    Get user statistics (Admin/Manager only)
 // @route   GET /api/users/stats
-// @access  Private/Admin
+// @access  Private/Admin/Manager
 export const getUserStats = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
+    console.log("Getting user stats...");
+
     const totalUsers = await User.countDocuments();
+    console.log("Total users:", totalUsers);
+
     const activeUsers = await User.countDocuments({
       status: UserStatus.ACTIVE,
     });
+    console.log("Active users:", activeUsers);
+
     const inactiveUsers = await User.countDocuments({
       status: UserStatus.INACTIVE,
     });
+    console.log("Inactive users:", inactiveUsers);
+
     const suspendedUsers = await User.countDocuments({
       status: UserStatus.SUSPENDED,
     });
+    console.log("Suspended users:", suspendedUsers);
 
     const adminUsers = await User.countDocuments({ role: UserRole.ADMIN });
+    console.log("Admin users:", adminUsers);
+
     const managerUsers = await User.countDocuments({ role: UserRole.MANAGER });
+    console.log("Manager users:", managerUsers);
+
     const regularUsers = await User.countDocuments({ role: UserRole.USER });
+    console.log("Regular users:", regularUsers);
 
     const verifiedUsers = await User.countDocuments({ isEmailVerified: true });
+    console.log("Verified users:", verifiedUsers);
+
     const unverifiedUsers = await User.countDocuments({
       isEmailVerified: false,
     });
+    console.log("Unverified users:", unverifiedUsers);
 
     // Get users by department
     const departmentStats = await User.aggregate([
       { $group: { _id: "$department", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
     ]);
+    console.log("Department stats:", departmentStats);
 
     // Get recent registrations (last 30 days)
     const thirtyDaysAgo = new Date();
@@ -483,6 +501,7 @@ export const getUserStats = async (
     const recentRegistrations = await User.countDocuments({
       createdAt: { $gte: thirtyDaysAgo },
     });
+    console.log("Recent registrations:", recentRegistrations);
 
     res.json({
       success: true,

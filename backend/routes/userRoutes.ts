@@ -1,4 +1,9 @@
 import {
+  authMiddleware,
+  requireAdmin,
+  requireAdminOrManager,
+} from "../middlewares/authMiddleware";
+import {
   bulkUpdateUsers,
   createUser,
   deleteUser,
@@ -12,7 +17,6 @@ import {
 } from "../controllers/userController";
 
 import asyncHandler from "express-async-handler";
-import { authMiddleware } from "../middlewares/authMiddleware";
 import express from "express";
 
 const router = express.Router();
@@ -86,7 +90,7 @@ const router = express.Router();
  *       500:
  *         description: Internal server error
  */
-router.get("/", authMiddleware, asyncHandler(getAllUsers));
+router.get("/", authMiddleware, requireAdmin, asyncHandler(getAllUsers));
 /**
  * @swagger
  * /api/users/stats:
@@ -114,7 +118,12 @@ router.get("/", authMiddleware, asyncHandler(getAllUsers));
  *       500:
  *         description: Internal server error
  */
-router.get("/stats", authMiddleware, asyncHandler(getUserStats));
+router.get(
+  "/stats",
+  authMiddleware,
+  requireAdminOrManager,
+  asyncHandler(getUserStats)
+);
 /**
  * @swagger
  * /api/users/search:
@@ -162,7 +171,7 @@ router.get("/stats", authMiddleware, asyncHandler(getUserStats));
  *       500:
  *         description: Internal server error
  */
-router.get("/search", authMiddleware, asyncHandler(searchUsers));
+router.get("/search", authMiddleware, requireAdmin, asyncHandler(searchUsers));
 /**
  * @swagger
  * /api/users/{id}:
@@ -202,7 +211,7 @@ router.get("/search", authMiddleware, asyncHandler(searchUsers));
  *       500:
  *         description: Internal server error
  */
-router.get("/:id", authMiddleware, asyncHandler(getUserById));
+router.get("/:id", authMiddleware, requireAdmin, asyncHandler(getUserById));
 /**
  * @swagger
  * /api/users:
@@ -244,7 +253,7 @@ router.get("/:id", authMiddleware, asyncHandler(getUserById));
  *       500:
  *         description: Internal server error
  */
-router.post("/", authMiddleware, asyncHandler(createUser));
+router.post("/", authMiddleware, requireAdmin, asyncHandler(createUser));
 /**
  * @swagger
  * /api/users/{id}:
@@ -295,7 +304,7 @@ router.post("/", authMiddleware, asyncHandler(createUser));
  *       500:
  *         description: Internal server error
  */
-router.put("/:id", authMiddleware, asyncHandler(updateUser));
+router.put("/:id", authMiddleware, requireAdmin, asyncHandler(updateUser));
 /**
  * @swagger
  * /api/users/{id}:
@@ -333,7 +342,7 @@ router.put("/:id", authMiddleware, asyncHandler(updateUser));
  *       500:
  *         description: Internal server error
  */
-router.delete("/:id", authMiddleware, asyncHandler(deleteUser));
+router.delete("/:id", authMiddleware, requireAdmin, asyncHandler(deleteUser));
 /**
  * @swagger
  * /api/users/{id}/status:
@@ -384,7 +393,12 @@ router.delete("/:id", authMiddleware, asyncHandler(deleteUser));
  *       500:
  *         description: Internal server error
  */
-router.patch("/:id/status", authMiddleware, asyncHandler(updateUserStatus));
+router.patch(
+  "/:id/status",
+  authMiddleware,
+  requireAdmin,
+  asyncHandler(updateUserStatus)
+);
 /**
  * @swagger
  * /api/users/{id}/role:
@@ -435,7 +449,12 @@ router.patch("/:id/status", authMiddleware, asyncHandler(updateUserStatus));
  *       500:
  *         description: Internal server error
  */
-router.patch("/:id/role", authMiddleware, asyncHandler(updateUserRole));
+router.patch(
+  "/:id/role",
+  authMiddleware,
+  requireAdmin,
+  asyncHandler(updateUserRole)
+);
 /**
  * @swagger
  * /api/users/bulk-update:
@@ -482,6 +501,11 @@ router.patch("/:id/role", authMiddleware, asyncHandler(updateUserRole));
  *       500:
  *         description: Internal server error
  */
-router.patch("/bulk-update", authMiddleware, asyncHandler(bulkUpdateUsers));
+router.patch(
+  "/bulk-update",
+  authMiddleware,
+  requireAdmin,
+  asyncHandler(bulkUpdateUsers)
+);
 
 export default router;

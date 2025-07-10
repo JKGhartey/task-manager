@@ -64,6 +64,11 @@ export const authMiddleware = async (
 
       // Check if user is active
       if (user.status !== "active") {
+        console.log(
+          "User status check failed:",
+          user.status,
+          "expected: active"
+        );
         res.status(401).json({
           success: false,
           message: "User account is not active.",
@@ -106,7 +111,15 @@ export const requireRole = (roles: string[]) => {
       return;
     }
 
+    console.log(
+      "Role check - User role:",
+      req.user.role,
+      "Required roles:",
+      roles
+    );
+
     if (!roles.includes(req.user.role)) {
+      console.log("Role check failed - User role not in required roles");
       res.status(403).json({
         success: false,
         message: "Access denied. Insufficient permissions.",
@@ -114,6 +127,7 @@ export const requireRole = (roles: string[]) => {
       return;
     }
 
+    console.log("Role check passed");
     next();
   };
 };
