@@ -22,7 +22,11 @@ const PORT = process.env.PORT || 3001;
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "http://localhost:5173", // Your frontend URL
+  origin: [
+    "http://localhost:5173", // Local development
+    "http://localhost:3000", // Alternative local port
+    process.env.FRONTEND_URL, // Production frontend URL
+  ].filter((url): url is string => Boolean(url)), // Remove undefined values and ensure string type
   credentials: true, // Allow cookies and authentication headers
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],

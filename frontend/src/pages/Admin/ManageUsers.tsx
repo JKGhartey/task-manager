@@ -8,15 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -56,25 +47,25 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useUsers, type CreateUserData } from "@/hooks/useUsers";
+import {
+  useUsers,
+  type CreateUserData,
+  type User,
+  type UpdateUserData,
+} from "@/hooks/useUsers";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  CreateUserModal,
+  EditUserModal,
+  ViewUserModal,
+} from "@/components/modals";
 
 export default function ManageUsers() {
   const { isAuthenticated } = useAuth();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [createUserData, setCreateUserData] = useState<CreateUserData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    role: "user",
-    status: "active",
-    department: "",
-    position: "",
-    phone: "",
-    dateOfBirth: "",
-    hireDate: "",
-  });
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Use the custom hook for user management
   const {
@@ -84,6 +75,7 @@ export default function ManageUsers() {
     filters,
     pagination,
     createUser,
+    updateUser,
     updateUserStatus,
     updateUserRole,
     updateFilters,
@@ -92,27 +84,38 @@ export default function ManageUsers() {
   } = useUsers();
 
   // Handle create user
-  const handleCreateUser = async () => {
+  const handleCreateUser = async (userData: CreateUserData) => {
     try {
-      await createUser(createUserData);
+      await createUser(userData);
       setIsCreateDialogOpen(false);
-      setCreateUserData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
-        role: "user",
-        status: "active",
-        department: "",
-        position: "",
-        phone: "",
-        dateOfBirth: "",
-        hireDate: "",
-      });
     } catch (error) {
       // Error is already handled by the hook
       console.error("Failed to create user:", error);
     }
+  };
+
+  // Handle edit user
+  const handleEditUser = async (userId: string, userData: UpdateUserData) => {
+    try {
+      await updateUser(userId, userData);
+      setIsEditDialogOpen(false);
+      setSelectedUser(null);
+    } catch (error) {
+      // Error is already handled by the hook
+      console.error("Failed to update user:", error);
+    }
+  };
+
+  // Handle view user
+  const handleViewUser = (user: User) => {
+    setSelectedUser(user);
+    setIsViewDialogOpen(true);
+  };
+
+  // Handle edit user click
+  const handleEditUserClick = (user: User) => {
+    setSelectedUser(user);
+    setIsEditDialogOpen(true);
   };
 
   // Handle filter changes
@@ -194,189 +197,17 @@ export default function ManageUsers() {
               Manage system users, roles, and permissions
             </p>
           </div>
-          <Dialog
-            open={isCreateDialogOpen}
+          <CreateUserModal
+            isOpen={isCreateDialogOpen}
             onOpenChange={setIsCreateDialogOpen}
-          >
-            <DialogTrigger asChild>
+            onSubmit={handleCreateUser}
+            trigger={
               <Button className="w-full sm:w-auto">
                 <IconPlus className="w-4 h-4 mr-2" />
                 Create User
               </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Create New User</DialogTitle>
-                <DialogDescription>
-                  Add a new user to the system. You can assign roles and set
-                  initial status.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input
-                    id="firstName"
-                    value={createUserData.firstName}
-                    onChange={(e) =>
-                      setCreateUserData({
-                        ...createUserData,
-                        firstName: e.target.value,
-                      })
-                    }
-                    placeholder="Enter first name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    value={createUserData.lastName}
-                    onChange={(e) =>
-                      setCreateUserData({
-                        ...createUserData,
-                        lastName: e.target.value,
-                      })
-                    }
-                    placeholder="Enter last name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={createUserData.email}
-                    onChange={(e) =>
-                      setCreateUserData({
-                        ...createUserData,
-                        email: e.target.value,
-                      })
-                    }
-                    placeholder="Enter email address"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={createUserData.password}
-                    onChange={(e) =>
-                      setCreateUserData({
-                        ...createUserData,
-                        password: e.target.value,
-                      })
-                    }
-                    placeholder="Enter password"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="role">Role</Label>
-                  <Select
-                    value={createUserData.role}
-                    onValueChange={(value: "user" | "admin" | "manager") =>
-                      setCreateUserData({ ...createUserData, role: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">User</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
-                  <Select
-                    value={createUserData.status}
-                    onValueChange={(
-                      value: "active" | "inactive" | "suspended"
-                    ) =>
-                      setCreateUserData({ ...createUserData, status: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                      <SelectItem value="suspended">Suspended</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="department">Department</Label>
-                  <Input
-                    id="department"
-                    value={createUserData.department}
-                    onChange={(e) =>
-                      setCreateUserData({
-                        ...createUserData,
-                        department: e.target.value,
-                      })
-                    }
-                    placeholder="Enter department"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="position">Position</Label>
-                  <Input
-                    id="position"
-                    value={createUserData.position}
-                    onChange={(e) =>
-                      setCreateUserData({
-                        ...createUserData,
-                        position: e.target.value,
-                      })
-                    }
-                    placeholder="Enter position"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    value={createUserData.phone}
-                    onChange={(e) =>
-                      setCreateUserData({
-                        ...createUserData,
-                        phone: e.target.value,
-                      })
-                    }
-                    placeholder="Enter phone number"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="hireDate">Hire Date</Label>
-                  <Input
-                    id="hireDate"
-                    type="date"
-                    value={createUserData.hireDate}
-                    onChange={(e) =>
-                      setCreateUserData({
-                        ...createUserData,
-                        hireDate: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-              </div>
-              <DialogFooter className="gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsCreateDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={handleCreateUser}>Create User</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+            }
+          />
         </div>
 
         {/* Filters */}
@@ -599,11 +430,15 @@ export default function ManageUsers() {
                             <DropdownMenuContent align="end" className="w-48">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleViewUser(user)}
+                              >
                                 <IconEye className="w-4 h-4 mr-2" />
                                 View Details
                               </DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleEditUserClick(user)}
+                              >
                                 <IconEdit className="w-4 h-4 mr-2" />
                                 Edit User
                               </DropdownMenuItem>
@@ -709,6 +544,20 @@ export default function ManageUsers() {
             </CardContent>
           </Card>
         )}
+
+        {/* Modal Components */}
+        <EditUserModal
+          isOpen={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          user={selectedUser}
+          onSubmit={handleEditUser}
+        />
+
+        <ViewUserModal
+          isOpen={isViewDialogOpen}
+          onOpenChange={setIsViewDialogOpen}
+          user={selectedUser}
+        />
       </div>
     </AdminLayout>
   );

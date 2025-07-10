@@ -305,7 +305,7 @@ export default function ManageDepartments() {
 
         {/* Create Department Modal */}
         <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create Department</DialogTitle>
               <DialogDescription>
@@ -313,7 +313,7 @@ export default function ManageDepartments() {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleCreateSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="create-name">Department Name *</Label>
                   <Input
@@ -357,7 +357,7 @@ export default function ManageDepartments() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="create-manager">Manager</Label>
                   <Select
@@ -400,7 +400,7 @@ export default function ManageDepartments() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="create-location">Location</Label>
                   <Input
@@ -447,7 +447,7 @@ export default function ManageDepartments() {
 
         {/* Edit Department Modal */}
         <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Department</DialogTitle>
               <DialogDescription>
@@ -456,7 +456,7 @@ export default function ManageDepartments() {
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleEditSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="edit-name">Department Name *</Label>
                   <Input
@@ -500,7 +500,7 @@ export default function ManageDepartments() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="edit-manager">Manager</Label>
                   <Select
@@ -543,7 +543,7 @@ export default function ManageDepartments() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="edit-location">Location</Label>
                   <Input

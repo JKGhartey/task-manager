@@ -180,8 +180,8 @@ const CreateTask = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
+            <div className="space-y-6">
+              <div className="space-y-2">
                 <Label htmlFor="title">Task Title *</Label>
                 <Input
                   id="title"
@@ -192,7 +192,7 @@ const CreateTask = () => {
                 />
               </div>
 
-              <div className="md:col-span-2">
+              <div className="space-y-2">
                 <Label htmlFor="description">Description *</Label>
                 <textarea
                   id="description"
@@ -207,7 +207,7 @@ const CreateTask = () => {
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="type">Type</Label>
                 <Select
                   value={formData.type}
@@ -226,7 +226,7 @@ const CreateTask = () => {
                 </Select>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="priority">Priority</Label>
                 <Select
                   value={formData.priority}
@@ -246,7 +246,7 @@ const CreateTask = () => {
                 </Select>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="assignee">Assignee *</Label>
                 <Select
                   value={formData.assignee || undefined}
@@ -267,7 +267,7 @@ const CreateTask = () => {
                 </Select>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="department">Department</Label>
                 <Select
                   value={formData.department || undefined}
@@ -288,7 +288,7 @@ const CreateTask = () => {
                 </Select>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="project">Project</Label>
                 <Select
                   value={formData.project || undefined}
@@ -307,7 +307,7 @@ const CreateTask = () => {
                 </Select>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="dueDate">Due Date</Label>
                 <Input
                   id="dueDate"
@@ -318,7 +318,7 @@ const CreateTask = () => {
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="estimatedHours">Estimated Hours</Label>
                 <Input
                   id="estimatedHours"

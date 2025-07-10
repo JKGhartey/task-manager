@@ -195,8 +195,8 @@ const EditTask = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
+            <div className="space-y-6">
+              <div className="space-y-2">
                 <Label htmlFor="title">Task Title *</Label>
                 <Input
                   id="title"
@@ -207,7 +207,7 @@ const EditTask = () => {
                 />
               </div>
 
-              <div className="md:col-span-2">
+              <div className="space-y-2">
                 <Label htmlFor="description">Description *</Label>
                 <textarea
                   id="description"
@@ -222,7 +222,7 @@ const EditTask = () => {
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="type">Type</Label>
                 <Select
                   value={formData.type || "feature"}
@@ -241,7 +241,7 @@ const EditTask = () => {
                 </Select>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="priority">Priority</Label>
                 <Select
                   value={formData.priority || "medium"}
@@ -261,7 +261,7 @@ const EditTask = () => {
                 </Select>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="assignee">Assignee *</Label>
                 <Select
                   value={formData.assignee || undefined}
@@ -282,7 +282,7 @@ const EditTask = () => {
                 </Select>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="project">Project</Label>
                 <Select
                   value={formData.project || ""}
@@ -301,7 +301,7 @@ const EditTask = () => {
                 </Select>
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="department">Department</Label>
                 <Input
                   id="department"
@@ -313,7 +313,7 @@ const EditTask = () => {
                 />
               </div>
 
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="estimatedHours">Estimated Hours</Label>
                 <Input
                   id="estimatedHours"

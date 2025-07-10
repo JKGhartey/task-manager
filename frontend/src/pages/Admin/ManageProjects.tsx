@@ -404,7 +404,7 @@ export default function ManageProjects() {
 
         {/* Create Project Modal */}
         <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-          <DialogContent>
+          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Project</DialogTitle>
               <DialogDescription>
@@ -412,7 +412,7 @@ export default function ManageProjects() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="name">Project Name</Label>
                 <Input
                   id="name"
@@ -426,7 +426,7 @@ export default function ManageProjects() {
                   placeholder="Enter project name"
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
@@ -440,7 +440,7 @@ export default function ManageProjects() {
                   placeholder="Enter project description"
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="team">Team (Optional)</Label>
                 <Select
                   value={createFormData.team}
@@ -476,7 +476,7 @@ export default function ManageProjects() {
 
         {/* Edit Project Modal */}
         <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-          <DialogContent>
+          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Project</DialogTitle>
               <DialogDescription>
@@ -484,7 +484,7 @@ export default function ManageProjects() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="edit-name">Project Name</Label>
                 <Input
                   id="edit-name"
@@ -495,7 +495,7 @@ export default function ManageProjects() {
                   placeholder="Enter project name"
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="edit-description">Description</Label>
                 <Textarea
                   id="edit-description"
@@ -509,7 +509,7 @@ export default function ManageProjects() {
                   placeholder="Enter project description"
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="edit-team">Team</Label>
                 <Select
                   value={editFormData.team}
@@ -545,7 +545,7 @@ export default function ManageProjects() {
           open={showAssignTaskModal}
           onOpenChange={setShowAssignTaskModal}
         >
-          <DialogContent>
+          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Assign Task to Project</DialogTitle>
               <DialogDescription>
@@ -553,7 +553,7 @@ export default function ManageProjects() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="task">Select Task</Label>
                 <Select value={selectedTask} onValueChange={setSelectedTask}>
                   <SelectTrigger>

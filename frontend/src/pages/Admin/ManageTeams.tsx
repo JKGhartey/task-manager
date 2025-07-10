@@ -366,7 +366,7 @@ export default function ManageTeams() {
 
         {/* Create Team Modal */}
         <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-          <DialogContent>
+          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Team</DialogTitle>
               <DialogDescription>
@@ -374,7 +374,7 @@ export default function ManageTeams() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="name">Team Name</Label>
                 <Input
                   id="name"
@@ -388,7 +388,7 @@ export default function ManageTeams() {
                   placeholder="Enter team name"
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
@@ -417,7 +417,7 @@ export default function ManageTeams() {
 
         {/* Edit Team Modal */}
         <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-          <DialogContent>
+          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Team</DialogTitle>
               <DialogDescription>
@@ -425,7 +425,7 @@ export default function ManageTeams() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="edit-name">Team Name</Label>
                 <Input
                   id="edit-name"
@@ -436,7 +436,7 @@ export default function ManageTeams() {
                   placeholder="Enter team name"
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="edit-description">Description</Label>
                 <Textarea
                   id="edit-description"
@@ -462,7 +462,7 @@ export default function ManageTeams() {
 
         {/* Assign User Modal */}
         <Dialog open={showAssignModal} onOpenChange={setShowAssignModal}>
-          <DialogContent>
+          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Assign User to Team</DialogTitle>
               <DialogDescription>
@@ -470,7 +470,7 @@ export default function ManageTeams() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="user">Select User</Label>
                 <Select value={selectedUser} onValueChange={setSelectedUser}>
                   <SelectTrigger>
