@@ -46,7 +46,16 @@ export function AdminSectionCards() {
   const [error, setError] = useState<string | null>(null);
 
   // Use the user stats hook
-  const { stats: userStats } = useUserStats();
+  const {
+    stats: userStats,
+    loading: userStatsLoading,
+    error: userStatsError,
+  } = useUserStats();
+
+  // Debug logging
+  console.log("User stats:", userStats);
+  console.log("User stats loading:", userStatsLoading);
+  console.log("User stats error:", userStatsError);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -81,7 +90,7 @@ export function AdminSectionCards() {
     };
 
     fetchStats();
-  }, []);
+  }, [userStats]);
 
   if (loading) {
     return (
@@ -113,38 +122,8 @@ export function AdminSectionCards() {
     );
   }
 
-  const userActivityRate =
-    adminStats.totalUsers > 0
-      ? Math.round((adminStats.activeUsers / adminStats.totalUsers) * 100)
-      : 0;
-
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      {/* User Management Card */}
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>User Management</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {adminStats.totalUsers}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline" className="text-blue-600 border-blue-200">
-              <IconUsers className="size-3" />
-              Total Users
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium text-blue-600">
-            {adminStats.activeUsers} active users{" "}
-            <IconTrendingUp className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            {userActivityRate}% activity rate
-          </div>
-        </CardFooter>
-      </Card>
-
       {/* Team Management Card */}
       <Card className="@container/card">
         <CardHeader>

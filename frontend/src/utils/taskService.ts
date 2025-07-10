@@ -95,7 +95,15 @@ export interface CreateTaskData {
   isPublic?: boolean;
 }
 
-export interface UpdateTaskData extends Partial<CreateTaskData> {}
+export interface UpdateTaskData extends Partial<CreateTaskData> {
+  status?:
+    | "pending"
+    | "in_progress"
+    | "review"
+    | "testing"
+    | "done"
+    | "cancelled";
+}
 
 export interface TaskFilters {
   page?: number;

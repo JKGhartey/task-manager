@@ -258,6 +258,7 @@ const ManageTasks = () => {
         description: taskData.description,
         type: taskData.type,
         priority: taskData.priority,
+        status: taskData.status,
         assignee: taskData.assignee._id,
         project: taskData.project || "none",
         department: taskData.department || "none",
@@ -1218,6 +1219,44 @@ const ManageTasks = () => {
                           <SelectItem value="medium">Medium</SelectItem>
                           <SelectItem value="high">High</SelectItem>
                           <SelectItem value="urgent">Urgent</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="w-full">
+                      <Label
+                        htmlFor="edit-status"
+                        className="text-base font-medium"
+                      >
+                        Status
+                      </Label>
+                      <Select
+                        value={editFormData.status || "pending"}
+                        onValueChange={(value) =>
+                          setEditFormData({
+                            ...editFormData,
+                            status: value as
+                              | "pending"
+                              | "in_progress"
+                              | "review"
+                              | "testing"
+                              | "done"
+                              | "cancelled",
+                          })
+                        }
+                      >
+                        <SelectTrigger className="mt-2 h-12 text-base w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="in_progress">
+                            In Progress
+                          </SelectItem>
+                          <SelectItem value="review">Review</SelectItem>
+                          <SelectItem value="testing">Testing</SelectItem>
+                          <SelectItem value="done">Done</SelectItem>
+                          <SelectItem value="cancelled">Cancelled</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

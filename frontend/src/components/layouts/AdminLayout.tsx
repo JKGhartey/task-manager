@@ -1,11 +1,16 @@
-import { AdminHeader, AdminSidebar } from "@/components/admin";
+import { AdminHeader, AdminSidebar, ManagerSidebar } from "@/components/admin";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+
+import { useAuth } from "@/hooks/useAuth";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
 export function AdminLayout({ children }: AdminLayoutProps) {
+  const { user } = useAuth();
+  const isManager = user?.role === "manager";
+
   return (
     <SidebarProvider
       style={
@@ -15,7 +20,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         } as React.CSSProperties
       }
     >
-      <AdminSidebar variant="inset" />
+      {isManager ? (
+        <ManagerSidebar variant="inset" />
+      ) : (
+        <AdminSidebar variant="inset" />
+      )}
       <SidebarInset>
         <AdminHeader />
         <div className="flex flex-1 flex-col">

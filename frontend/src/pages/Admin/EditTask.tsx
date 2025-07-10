@@ -63,6 +63,7 @@ const EditTask = () => {
         description: taskData.description,
         type: taskData.type,
         priority: taskData.priority,
+        status: taskData.status,
         assignee: taskData.assignee._id,
         project: taskData.project || "",
         department: taskData.department || "",
@@ -257,6 +258,26 @@ const EditTask = () => {
                     <SelectItem value="medium">Medium</SelectItem>
                     <SelectItem value="high">High</SelectItem>
                     <SelectItem value="urgent">Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select
+                  value={formData.status || "pending"}
+                  onValueChange={(value) => handleInputChange("status", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="review">Review</SelectItem>
+                    <SelectItem value="testing">Testing</SelectItem>
+                    <SelectItem value="done">Done</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
