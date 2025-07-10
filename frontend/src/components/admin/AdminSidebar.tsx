@@ -65,11 +65,6 @@ const adminData = {
       icon: IconFolder,
     },
     {
-      title: "View Departments",
-      url: ROUTES.USER.VIEW_DEPARTMENTS,
-      icon: IconBuilding,
-    },
-    {
       title: "Manage Departments",
       url: ROUTES.ADMIN.MANAGE_DEPARTMENTS,
       icon: IconBuilding,
