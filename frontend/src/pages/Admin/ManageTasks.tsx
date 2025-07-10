@@ -36,6 +36,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
 import {
   taskService,
   type Task,
@@ -100,6 +101,10 @@ const ManageTasks = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [viewingTask, setViewingTask] = useState<Task | null>(null);
+
+  // Calendar states
+  const [showCreateCalendar, setShowCreateCalendar] = useState(false);
+  const [showEditCalendar, setShowEditCalendar] = useState(false);
 
   // Form states
   const [createFormData, setCreateFormData] = useState<CreateTaskData>({
@@ -175,6 +180,22 @@ const ManageTasks = () => {
       fetchProjects();
     }
   }, [isAuthenticated, filters]);
+
+  // Close calendars when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest(".calendar-container") && !target.closest("button")) {
+        setShowCreateCalendar(false);
+        setShowEditCalendar(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleDeleteTask = async (taskId: string) => {
     if (!confirm("Are you sure you want to delete this task?")) {
@@ -364,6 +385,22 @@ const ManageTasks = () => {
       }));
     }
   };
+
+  // Close calendars when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (!target.closest(".calendar-container") && !target.closest("button")) {
+        setShowCreateCalendar(false);
+        setShowEditCalendar(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   if (!isAuthenticated) {
     return (
@@ -680,7 +717,7 @@ const ManageTasks = () => {
 
         {/* Create Task Modal */}
         <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-          <DialogContent className="w-[40vw] max-h-[95vh] overflow-y-auto">
+          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader className="pb-6">
               <DialogTitle className="text-3xl font-bold">
                 Create New Task
@@ -815,7 +852,7 @@ const ManageTasks = () => {
                   </h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div>
+                  <div className="w-full">
                     <Label htmlFor="assignee" className="text-base font-medium">
                       Assignee *
                     </Label>
@@ -828,7 +865,7 @@ const ManageTasks = () => {
                         })
                       }
                     >
-                      <SelectTrigger className="mt-2 h-12 text-base">
+                      <SelectTrigger className="mt-2 h-12 text-base w-full">
                         <SelectValue placeholder="Select assignee" />
                       </SelectTrigger>
                       <SelectContent>
@@ -841,7 +878,7 @@ const ManageTasks = () => {
                     </Select>
                   </div>
 
-                  <div>
+                  <div className="w-full">
                     <Label htmlFor="project" className="text-base font-medium">
                       Project
                     </Label>
@@ -851,7 +888,7 @@ const ManageTasks = () => {
                         setCreateFormData({ ...createFormData, project: value })
                       }
                     >
-                      <SelectTrigger className="mt-2 h-12 text-base">
+                      <SelectTrigger className="mt-2 h-12 text-base w-full">
                         <SelectValue placeholder="Select project" />
                       </SelectTrigger>
                       <SelectContent>
@@ -865,7 +902,7 @@ const ManageTasks = () => {
                     </Select>
                   </div>
 
-                  <div>
+                  <div className="w-full">
                     <Label
                       htmlFor="department"
                       className="text-base font-medium"
@@ -881,7 +918,7 @@ const ManageTasks = () => {
                         })
                       }
                     >
-                      <SelectTrigger className="mt-2 h-12 text-base">
+                      <SelectTrigger className="mt-2 h-12 text-base w-full">
                         <SelectValue placeholder="Select department" />
                       </SelectTrigger>
                       <SelectContent>
@@ -895,25 +932,52 @@ const ManageTasks = () => {
                     </Select>
                   </div>
 
-                  <div>
+                  <div className="w-full">
                     <Label htmlFor="dueDate" className="text-base font-medium">
                       Due Date
                     </Label>
-                    <Input
-                      id="dueDate"
-                      type="date"
-                      value={createFormData.dueDate}
-                      onChange={(e) =>
-                        setCreateFormData({
-                          ...createFormData,
-                          dueDate: e.target.value,
-                        })
-                      }
-                      className="mt-2 h-12 text-base"
-                    />
+                    <div className="relative">
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          setShowCreateCalendar(!showCreateCalendar)
+                        }
+                        className="mt-2 h-12 text-base w-full justify-start text-left font-normal"
+                      >
+                        {createFormData.dueDate ? (
+                          new Date(createFormData.dueDate).toLocaleDateString()
+                        ) : (
+                          <span className="text-muted-foreground">
+                            Pick a date
+                          </span>
+                        )}
+                      </Button>
+                      {showCreateCalendar && (
+                        <div className="calendar-container absolute top-full left-0 z-50 mt-1 bg-background border rounded-md shadow-lg">
+                          <Calendar
+                            mode="single"
+                            selected={
+                              createFormData.dueDate
+                                ? new Date(createFormData.dueDate)
+                                : undefined
+                            }
+                            onSelect={(date) => {
+                              setCreateFormData({
+                                ...createFormData,
+                                dueDate: date
+                                  ? date.toISOString().split("T")[0]
+                                  : "",
+                              });
+                              setShowCreateCalendar(false);
+                            }}
+                            initialFocus
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  <div>
+                  <div className="w-full">
                     <Label
                       htmlFor="estimatedHours"
                       className="text-base font-medium"
@@ -933,7 +997,7 @@ const ManageTasks = () => {
                         })
                       }
                       placeholder="Enter estimated hours"
-                      className="mt-2 h-12 text-base"
+                      className="mt-2 h-12 text-base w-full"
                     />
                   </div>
                 </div>
@@ -1029,7 +1093,7 @@ const ManageTasks = () => {
 
         {/* Edit Task Modal */}
         <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-          <DialogContent className="w-[40vw] max-h-[95vh] overflow-y-auto">
+          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader className="pb-6">
               <DialogTitle className="text-3xl font-bold">
                 Edit Task
@@ -1091,7 +1155,7 @@ const ManageTasks = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div>
+                    <div className="w-full">
                       <Label
                         htmlFor="edit-type"
                         className="text-base font-medium"
@@ -1112,7 +1176,7 @@ const ManageTasks = () => {
                           })
                         }
                       >
-                        <SelectTrigger className="mt-2 h-12 text-base">
+                        <SelectTrigger className="mt-2 h-12 text-base w-full">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -1126,7 +1190,7 @@ const ManageTasks = () => {
                       </Select>
                     </div>
 
-                    <div>
+                    <div className="w-full">
                       <Label
                         htmlFor="edit-priority"
                         className="text-base font-medium"
@@ -1146,7 +1210,7 @@ const ManageTasks = () => {
                           })
                         }
                       >
-                        <SelectTrigger className="mt-2 h-12 text-base">
+                        <SelectTrigger className="mt-2 h-12 text-base w-full">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -1170,7 +1234,7 @@ const ManageTasks = () => {
                   </h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div>
+                  <div className="w-full">
                     <Label
                       htmlFor="edit-assignee"
                       className="text-base font-medium"
@@ -1183,7 +1247,7 @@ const ManageTasks = () => {
                         setEditFormData({ ...editFormData, assignee: value })
                       }
                     >
-                      <SelectTrigger className="mt-2 h-12 text-base">
+                      <SelectTrigger className="mt-2 h-12 text-base w-full">
                         <SelectValue placeholder="Select assignee" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1196,7 +1260,7 @@ const ManageTasks = () => {
                     </Select>
                   </div>
 
-                  <div>
+                  <div className="w-full">
                     <Label
                       htmlFor="edit-project"
                       className="text-base font-medium"
@@ -1209,7 +1273,7 @@ const ManageTasks = () => {
                         setEditFormData({ ...editFormData, project: value })
                       }
                     >
-                      <SelectTrigger className="mt-2 h-12 text-base">
+                      <SelectTrigger className="mt-2 h-12 text-base w-full">
                         <SelectValue placeholder="Select project" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1223,7 +1287,7 @@ const ManageTasks = () => {
                     </Select>
                   </div>
 
-                  <div>
+                  <div className="w-full">
                     <Label
                       htmlFor="edit-department"
                       className="text-base font-medium"
@@ -1236,7 +1300,7 @@ const ManageTasks = () => {
                         setEditFormData({ ...editFormData, department: value })
                       }
                     >
-                      <SelectTrigger className="mt-2 h-12 text-base">
+                      <SelectTrigger className="mt-2 h-12 text-base w-full">
                         <SelectValue placeholder="Select department" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1250,28 +1314,53 @@ const ManageTasks = () => {
                     </Select>
                   </div>
 
-                  <div>
+                  <div className="w-full">
                     <Label
                       htmlFor="edit-dueDate"
                       className="text-base font-medium"
                     >
                       Due Date
                     </Label>
-                    <Input
-                      id="edit-dueDate"
-                      type="date"
-                      value={editFormData.dueDate || ""}
-                      onChange={(e) =>
-                        setEditFormData({
-                          ...editFormData,
-                          dueDate: e.target.value,
-                        })
-                      }
-                      className="mt-2 h-12 text-base"
-                    />
+                    <div className="relative">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowEditCalendar(!showEditCalendar)}
+                        className="mt-2 h-12 text-base w-full justify-start text-left font-normal"
+                      >
+                        {editFormData.dueDate ? (
+                          new Date(editFormData.dueDate).toLocaleDateString()
+                        ) : (
+                          <span className="text-muted-foreground">
+                            Pick a date
+                          </span>
+                        )}
+                      </Button>
+                      {showEditCalendar && (
+                        <div className="calendar-container absolute top-full left-0 z-50 mt-1 bg-background border rounded-md shadow-lg">
+                          <Calendar
+                            mode="single"
+                            selected={
+                              editFormData.dueDate
+                                ? new Date(editFormData.dueDate)
+                                : undefined
+                            }
+                            onSelect={(date) => {
+                              setEditFormData({
+                                ...editFormData,
+                                dueDate: date
+                                  ? date.toISOString().split("T")[0]
+                                  : "",
+                              });
+                              setShowEditCalendar(false);
+                            }}
+                            initialFocus
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  <div>
+                  <div className="w-full">
                     <Label
                       htmlFor="edit-estimatedHours"
                       className="text-base font-medium"
@@ -1291,7 +1380,7 @@ const ManageTasks = () => {
                         })
                       }
                       placeholder="Enter estimated hours"
-                      className="mt-2 h-12 text-base"
+                      className="mt-2 h-12 text-base w-full"
                     />
                   </div>
                 </div>
@@ -1390,7 +1479,7 @@ const ManageTasks = () => {
 
         {/* View Task Modal */}
         <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
-          <DialogContent className="w-[40vw] max-h-[90vh] overflow-y-auto">
+          <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader className="pb-6">
               <DialogTitle className="text-3xl font-bold">
                 Task Details
