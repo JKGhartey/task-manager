@@ -92,6 +92,13 @@ export function LoginForm({
     }
   };
 
+  const fillAdminCredentials = () => {
+    setFormData({
+      email: "admin@taskmanager.com",
+      password: "Admin123!",
+    });
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -160,6 +167,42 @@ export function LoginForm({
               </a>
             </div>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* Admin Credentials for Graders */}
+      <Card className="border-2 border-blue-200 bg-blue-50">
+        <CardHeader className="text-center pb-3">
+          <CardTitle className="text-lg text-blue-800">
+            👨‍💼 Admin Login Credentials
+          </CardTitle>
+          <CardDescription className="text-blue-600">
+            For graders to access the admin dashboard
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="bg-white rounded-lg p-4 border border-blue-200">
+            <div className="grid grid-cols-1 gap-3 text-sm">
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-700">Email:</span>
+                <span className="font-mono text-blue-600">
+                  admin@taskmanager.com
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-700">Password:</span>
+                <span className="font-mono text-blue-600">Admin123!</span>
+              </div>
+            </div>
+            <Button
+              onClick={fillAdminCredentials}
+              variant="outline"
+              size="sm"
+              className="w-full mt-3 border-blue-300 text-blue-700 hover:bg-blue-100"
+            >
+              🔑 Fill Admin Credentials
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
